@@ -1,0 +1,5 @@
+*.private.json
+node_modules
+dist
+.env
+.idea
