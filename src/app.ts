@@ -6,9 +6,8 @@ import { collections } from "./database/constants.js";
 import { handler as errorHandler } from "./common/appError";
 
 import express from 'express';
-import { initClient, getLastRunItems } from './service/client';
-// import { getAccountPostsByUsername } from './service/methods/getAccountPostsByUsername.js';
-import { createPosts } from './api/posts/createPosts.js';
+import { initClient } from './service/client';
+import { createAccountPosts } from './api/posts/createPosts';
 const app = express();
 const port = 3000;
 
@@ -32,12 +31,11 @@ app.get('/:accountUsername/posts', async (req, res) => {
 });
 
 app.post('/populate/:accountUsername/posts', async (req, res) => {
-  // const { params } = req;
-  // const { accountUsername } = params;
-  // const accountInput = await getAccountPostsByUsername(accountUsername);
-  const accountPosts = await getLastRunItems();
+  const { params, query } = req;
+  const { accountUsername } = params;
+  const { limit } = query; 
 
-  await createPosts(accountPosts);
+  await createAccountPosts(accountUsername, parseInt(limit.toString(), 10));
   res.sendStatus(200);
 });
 

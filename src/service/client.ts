@@ -46,5 +46,22 @@ async function getLastRunItems() {
     }
 }
 
-export { initClient, listItems, getLastRunItems };
+async function getLastRunBuildId(): Promise<string> {
+    try {
+        const actorClient = client.actor(process.env.APIFY_ACTOR_ID);
+
+        // Select the last run of your Actor that finished
+        // with a SUCCEEDED status.
+        const lastSucceededRunClient = actorClient.lastRun({ status: 'SUCCEEDED' });
+        // Fetches items from the run's dataset.
+        const { buildId } = await lastSucceededRunClient.get();
+
+        console.log(buildId);
+        return buildId;
+    } catch (error) {
+        console.error('Error fetching last run data:', error);
+    }
+}
+
+export { initClient, listItems, getLastRunItems, getLastRunBuildId };
 
