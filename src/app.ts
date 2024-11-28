@@ -1,13 +1,12 @@
 
 import dotenv from 'dotenv';
 
-import * as dbService from "./database/service.js";
-import { collections } from "./database/constants.js";
 import { handler as errorHandler } from "./common/appError";
 
 import express from 'express';
 import { initClient } from './service/client';
-import { createAccountPosts } from './api/posts/createPosts';
+import v1Routes from './api/v1';
+import { versionMiddleware } from './middleware/apiVersionMiddleware';
 const app = express();
 const port = 3000;
 
@@ -16,28 +15,7 @@ dotenv.config();
 
 initClient();
 
-app.get('/accounts', async (req, res) => {
-  const documents = await dbService.getAllDocuments(collections.accounts);
-  res.send(documents);
-});
-
-
-app.get('/:accountUsername/posts', async (req, res) => {
-  const { params } = req;
-  const { accountUsername } = params;
-  // const accountPosts = await getAccountPostsByUsername(accountUsername);
-  const documents = await dbService.getAllDocuments(collections.posts, {account_username: accountUsername});
-  res.send(documents);
-});
-
-app.post('/populate/:accountUsername/posts', async (req, res) => {
-  const { params, query } = req;
-  const { accountUsername } = params;
-  const { limit } = query; 
-
-  await createAccountPosts(accountUsername, parseInt(limit.toString(), 10));
-  res.sendStatus(200);
-});
+app.use('/api', versionMiddleware('1.0.0'), v1Routes);
 
 app.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);

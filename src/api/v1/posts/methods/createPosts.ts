@@ -1,10 +1,10 @@
-import { collections } from "../../database/constants";
-import { IAccount } from "../../database/interfaces/accounts";
-import { IPost, IInstagramPost } from "../../database/interfaces/posts";
-import * as dbService from "../../database/service";
-import { getLastRunBuildId } from "../../service/client";
-import { getAccountPostsByUsername } from "../../service/methods/getAccountPostsByUsername";
-import { createAccount } from "../accounts/createAccount";
+import { collections } from "../../../../database/constants";
+import { IAccount } from "../../../../database/interfaces/accounts";
+import { IPost, IInstagramPost } from "../../../../database/interfaces/posts";
+import * as dbService from "../../../../database/service";
+import { getLastRunBuildId } from "../../../../service/client";
+import { getAccountPostsByUsername } from "../../../../service/methods/getAccountPostsByUsername";
+import { createAccount } from "../../accounts/methods/createAccount";
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const NEW_FETCH = 30;
