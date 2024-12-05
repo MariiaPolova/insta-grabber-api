@@ -1,21 +1,27 @@
 
 import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
 
 import { handler as errorHandler } from "./common/appError";
 
-import express from 'express';
 import { initClient } from './service/client';
 import v1Routes from './api/v1';
 import { versionMiddleware } from './middleware/apiVersionMiddleware';
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // Load .env file variables into process.env
 dotenv.config();
 
 initClient();
 
-app.use('/api', versionMiddleware('1.0.0'), v1Routes);
+app.use(cors({
+  origin: 'http://localhost:3000'
+}));
+
+app.use('/api', v1Routes);
+// app.use('/api', versionMiddleware('1.0.0'), v1Routes);
 
 app.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);
