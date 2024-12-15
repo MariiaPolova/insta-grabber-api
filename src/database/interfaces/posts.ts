@@ -1,6 +1,5 @@
 enum MediaType {
     video = 'Video',
-
 }
 
 interface IInstagramPost {

@@ -1,5 +1,5 @@
 
-import * as dbService from "../../../../database/service";
+import * as dbService from "../../../../database/database.service";
 import { collections } from "../../../../database/constants";
 
 export const getAccounts = async (req, res) => {

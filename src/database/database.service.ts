@@ -1,12 +1,12 @@
 import { collections } from "./constants";
-import db from "./firebase";
+import { db } from "../firebase";
 import { IAccount } from "./interfaces/accounts";
 
 async function getDocument<T>(collectionName: collections, filter: { id?: string, username?: string }) {
     const { id, username } = filter;
     const docRef: FirebaseFirestore.CollectionReference = db.collection(collectionName);
     let query: FirebaseFirestore.Query;
-    if (id) { 
+    if (id) {
         const doc = await docRef.doc(id).get();
         if (doc.exists) {
             return doc.data() as T;
@@ -61,4 +61,22 @@ async function postDocument<T>(collectionName: collections, document: T) {
     return db.collection(collectionName).add(document);
 };
 
-export { getDocument, getAllDocuments, postDocuments, postDocument };
+async function updateDocument<T>(collectionName: collections, documentId: string, updateData: Partial<T>) {
+    const documentRef = db.collection(collectionName).doc(documentId);
+    await documentRef.update(updateData);
+};
+
+async function getDocumentsByArrayFilter<T>(collectionName: collections, fieldName: keyof T, arrayFilter: Array<string | number>) {
+    const collectionRef = db.collection(collectionName);
+    const querySnapshot = await collectionRef
+        .where(fieldName as string, "array-contains-any", arrayFilter)
+        .get();
+
+    const results = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+    }));
+    return results as T[];
+};
+
+export { getDocument, getAllDocuments, postDocuments, postDocument, updateDocument, getDocumentsByArrayFilter };

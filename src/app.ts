@@ -7,7 +7,7 @@ import { handler as errorHandler } from "./common/appError";
 
 import { initClient } from './service/client';
 import v1Routes from './api/v1';
-import { versionMiddleware } from './middleware/apiVersionMiddleware';
+// import { versionMiddleware } from './middleware/apiVersionMiddleware';
 const app = express();
 const port = 3001;
 
