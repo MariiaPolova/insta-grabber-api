@@ -6,6 +6,7 @@ import serviceAccount from '../grabber-firebase-adminsdk.private.json';
 
 const bucket = storage.bucket(serviceAccount.storage_bucket);
 
+type ActionType = "read" | "write" | "delete" | "resumable";
 const pipelineAsync = promisify(pipeline);
 
 function toNodeReadableStream(readableStream: ReadableStream<Uint8Array>): Readable {
@@ -57,11 +58,21 @@ const uploadImageFromCDN = async (cdnUrl: string, destinationPath: string): Prom
     }
 };
 
-const uploadImage = async (filePath, destination) => {
+const uploadImage = async (filePath: string, destination: string) => {
     await bucket.upload(filePath, {
         destination,
         public: true,
     });
 };
 
-export { uploadImage, uploadImageFromCDN };
+const getSignedImage = async (fileName: string) => {
+    const file = bucket.file(fileName);
+    const options = {
+        action: "read" as ActionType,
+        expires: Date.now() + 60 * 60 * 1000, // URL expiration (1 hour from now)
+      };
+    const [url] = await file.getSignedUrl(options);  
+    return url;
+}
+
+export { uploadImage, uploadImageFromCDN, getSignedImage };

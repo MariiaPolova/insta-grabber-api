@@ -79,4 +79,16 @@ async function getDocumentsByArrayFilter<T>(collectionName: collections, fieldNa
     return results as T[];
 };
 
-export { getDocument, getAllDocuments, postDocuments, postDocument, updateDocument, getDocumentsByArrayFilter };
+async function removeDocumentById(collectionName: collections, id) {
+    return db.collection(collectionName).doc(id).delete();
+}
+
+export { 
+    getDocument, 
+    getAllDocuments, 
+    postDocuments, 
+    postDocument, 
+    updateDocument, 
+    getDocumentsByArrayFilter, 
+    removeDocumentById 
+};

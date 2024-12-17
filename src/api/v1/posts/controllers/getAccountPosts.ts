@@ -1,11 +1,16 @@
 import * as dbService from "../../../../database/database.service";
 import { collections } from "../../../../database/constants";
+import { getSignedImage } from "../../../../storage/storage.service";
+import { IPost } from "../../../../database/interfaces/posts";
 
 
 export const getAccountPosts = async (req, res) => {
     const { params } = req;
     const { accountUsername } = params;
-    // const accountPosts = await getAccountPostsByUsername(accountUsername);
-    const documents = await dbService.getAllDocuments(collections.posts, { account_username: accountUsername });
-    res.send(documents);
+    const documents: IPost[] = await dbService.getAllDocuments(collections.posts, { account_username: accountUsername });
+    const documentsWithSignedUrls = await Promise.all(documents.map(async (doc) => {
+        const image = await getSignedImage(doc.display_url);
+        return { ...doc, display_url: image };
+    }))
+    res.send(documentsWithSignedUrls);
 }
