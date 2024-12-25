@@ -7,8 +7,8 @@ import { getLastRunBuildId } from "../../../../service/client";
 import { getAccountPostsByUsername } from "../../../../service/methods/getAccountPostsByUsername";
 import { uploadImageFromCDN } from "../../../../storage/storage.service";
 import { updateAccountById } from "../../accounts/methods/updateAccountById";
-import { AppError } from '../../../../common/appError';
 import { getFieldName } from '../../../../common/commonMethods';
+import { APIError } from '../../../../common/BaseError';
 
 // const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const NEW_FETCH = 30;
@@ -17,7 +17,7 @@ async function createPosts(posts: IInstagramPost[]) {
   try {
     let uniquePosts: IInstagramPost[];
     const postsIdsToBeCreated = posts.map(post => post.id);
-    const existingPosts = await dbService.getDocumentsByArrayFilter(collections.accounts, getFieldName<IPost>('post_id'), postsIdsToBeCreated);
+    const existingPosts = await dbService.getDocumentsByArrayFilter<IPost>(collections.accounts, getFieldName<IPost>('post_id'), postsIdsToBeCreated);
 
     if (existingPosts?.length) {
       uniquePosts = posts.filter(post => {
@@ -49,7 +49,7 @@ async function createPosts(posts: IInstagramPost[]) {
 
     return dbService.postDocuments<IPost>(collections.posts, accountPosts);
   } catch (error) {
-    throw new AppError(error, true);
+    throw new APIError(error);
   }
 }
 

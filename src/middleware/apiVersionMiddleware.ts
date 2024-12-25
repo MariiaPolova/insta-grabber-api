@@ -1,5 +1,6 @@
 import semver from 'semver';
-import { AppError } from '../common/appError';
+import { APIError } from '../common/BaseError';
+import { StatusCodes } from 'http-status-codes';
 
 export const versionMiddleware = (version) =>
     (req, res, next) => {
@@ -8,5 +9,5 @@ export const versionMiddleware = (version) =>
             return next();
         }
 
-        throw new AppError(`Current API version doesn't exist`, true)
+        throw new APIError(`Current API version doesn't exist`, StatusCodes.INTERNAL_SERVER_ERROR)
     };

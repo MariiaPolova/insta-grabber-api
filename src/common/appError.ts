@@ -1,26 +1,25 @@
-export class AppError extends Error {
-    public readonly isOperational: boolean;
-  
-    constructor(description: string, isOperational: boolean) {
-      super(description);
-      Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
-      this.isOperational = isOperational;
-      Error.captureStackTrace(this);
+
+import { Response } from 'express';
+import { BaseError } from "./BaseError";
+import { StatusCodes, getReasonPhrase } from 'http-status-codes';
+
+// centralized error handler encapsulates error-handling related logic
+class ErrorHandler {
+  public async handleError(err: BaseError | Error, res?: Response): Promise<void> {
+    console.error(err); // todo add logger
+    if (res && err instanceof BaseError) {
+      res
+      .status(err.httpCode || StatusCodes.INTERNAL_SERVER_ERROR)
+      .send(err.message ?? getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR));
     }
-  }
-  
-  // centralized error handler encapsulates error-handling related logic
-  class ErrorHandler {
-    public async handleError(err: Error): Promise<void> {
-      console.error(err);
-    };
-  
-    public isTrustedError(error: Error) {
-      if (error instanceof AppError) {
-        return error.isOperational;
-      }
-      return false;
+  };
+
+  public isTrustedError(error: Error) {
+    if (error instanceof BaseError) {
+      return error.isOperational;
     }
+    return false;
   }
-  
-  export const handler = new ErrorHandler();
+}
+
+export const handler = new ErrorHandler();

@@ -1,6 +1,6 @@
 import * as dbService from "../../../../database/database.service";
 import { collections } from "../../../../database/constants";
-import { AppError } from "../../../../common/appError";
+import { APIError } from "../../../../common/BaseError";
 
 
 export const removePost = async (req, res) => {
@@ -11,6 +11,6 @@ export const removePost = async (req, res) => {
 
         res.sendStatus(200);
     } catch (err) {
-        throw new AppError(err, false);
+        throw new APIError(err);
     }
 }

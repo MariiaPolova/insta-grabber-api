@@ -1,15 +1,16 @@
 import { collections } from "./constants";
 import { db } from "../firebase";
-import { IAccount } from "./interfaces/accounts";
 
 async function getDocument<T>(collectionName: collections, filter: { id?: string, username?: string }) {
     const { id, username } = filter;
     const docRef: FirebaseFirestore.CollectionReference = db.collection(collectionName);
     let query: FirebaseFirestore.Query;
     if (id) {
-        const doc = await docRef.doc(id).get();
-        if (doc.exists) {
+        const doc = await docRef.doc(id)?.get();
+        if (doc?.exists) {
             return doc.data() as T;
+        } else {
+            return null;
         }
     } else if (username) {
         query = docRef.where(`username`, '==', `${username}`);
@@ -18,11 +19,11 @@ async function getDocument<T>(collectionName: collections, filter: { id?: string
     const snapshot = await query.get();
     if (snapshot.empty) {
         console.log('No matching documents.');
-        return;
+        return null;
     }
 
     const doc = snapshot.docs[0];
-    return { id: doc.id, ...doc.data() } as IAccount;
+    return { id: doc.id, ...doc.data() } as T;
 };
 
 async function getAllDocuments<T>(collectionName: collections, filter?: object) {
@@ -43,7 +44,11 @@ async function getAllDocuments<T>(collectionName: collections, filter?: object) 
         return;
     }
 
-    return snapshot.docs.map(doc => doc.data()) as T[];
+    const results = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+    }));
+    return results as T[];
 };
 
 async function postDocuments<T>(collectionName: collections, documents: T[]) {
