@@ -2,6 +2,7 @@ import * as dbService from "../../../../database/database.service";
 import { collections } from "../../../../database/constants";
 import { getSignedImage } from "../../../../storage/storage.service";
 import { IPost } from "../../../../database/interfaces/posts";
+import { StatusCodes } from "http-status-codes";
 
 
 export const getAccountPosts = async (req, res) => {
@@ -12,5 +13,5 @@ export const getAccountPosts = async (req, res) => {
         const image = await getSignedImage(doc.display_url);
         return { ...doc, display_url: image };
     }))
-    res.send(documentsWithSignedUrls);
+    res.status(StatusCodes.OK).send(documentsWithSignedUrls);
 }

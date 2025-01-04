@@ -1,23 +1,29 @@
 
 import { firestore } from "firebase-admin";
-import * as dbService from "../../../../database/database.service";
-import { collections } from "../../../../database/constants";
+import Joi from 'joi';
 import { BadRequestError } from "../../../../common/BaseError";
+import accountActions from '../../../../database/collections/accounts';
+import { StatusCodes } from "http-status-codes";
+
+export const createAccountSchema = {
+    body: Joi.object({
+        username: Joi.string().min(3).max(30).required(),
+    })
+};
 
 export const createAccount = async (req, res, next) => {
     try {
         const { username } = req.body;
-        if (!username) {
-            throw new BadRequestError(`Username is missing`)
-        }
-
-        const existingAccount = await dbService.getDocument(collections.accounts, { username });
+        const existingAccount = await accountActions.getOne({ username });
 
         if (existingAccount) {
             throw new BadRequestError(`Account with  ${username} username is already created`);
         }
-        const document = await dbService.postDocument(collections.accounts, { username, created_at: firestore.Timestamp.now() });
-        res.status(201).send(document);
+        const document = await accountActions.createOne({ 
+            username, 
+            created_at: firestore.Timestamp.now() 
+        });
+        res.status(StatusCodes.CREATED).send(document);
     } catch (e) {
         next(e);
     }

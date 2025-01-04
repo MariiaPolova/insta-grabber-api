@@ -8,6 +8,7 @@ import { handler as errorHandler } from "./common/appError";
 import { initClient } from './service/client';
 import v1Routes from './api/v1';
 import { BaseError } from './common/BaseError';
+import { swaggerUi, swaggerSpec } from './common/swagger';
 // import { versionMiddleware } from './middleware/apiVersionMiddleware';
 const app = express();
 const port = 3001;
@@ -22,6 +23,10 @@ app.use(express.json())
 app.use(cors({
   origin: 'http://localhost:3000'
 }));
+
+// Serve Swagger UI documentation at /api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 app.use('/api', v1Routes);
 // app.use('/api', versionMiddleware('1.0.0'), v1Routes);
