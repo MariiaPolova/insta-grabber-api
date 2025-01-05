@@ -9,36 +9,27 @@ import {
     getDocumentsByArrayFilter,
     removeDocumentById
 } from "../database.service";
-
-function createCollectionLayer<T extends Record<string, (collectionName: collections, ...args: any[]) => any>>(
+  
+function createCollectionFunction<T extends (collectionName: collections, ...args: any[]) => any>(
     collectionName: collections,
-    methods: T
-  ): { [K in keyof T]: (...args: Parameters<T[K]> extends [any, ...infer U] ? U : never) => ReturnType<T[K]> } {
-    const wrappedMethods: Partial<
-      { [K in keyof T]: (...args: Parameters<T[K]> extends [any, ...infer U] ? U : never) => ReturnType<T[K]> }
-    > = {};
-  
-    for (const key in methods) {
-      if (Object.prototype.hasOwnProperty.call(methods, key)) {
-        const method = methods[key];
-        wrappedMethods[key] = ((...args: any[]) => method(collectionName, ...args)) as any;
-      }
-    }
-  
-    return wrappedMethods as { [K in keyof T]: (...args: Parameters<T[K]> extends [any, ...infer U] ? U : never) => ReturnType<T[K]> };
+    method: T
+  ): (...args: Parameters<T> extends [any, ...infer U] ? U : never) => ReturnType<T> {
+    return (...args: any[]) => method(collectionName, ...args);
   }
 
-  const methods = {
-    getOne: getDocument,
-    getAll: getAllDocuments,
-    createMany: postDocuments,
-    createOne: postDocument,
-    updateOne: updateDocument,
-    getByArrayFilter: getDocumentsByArrayFilter,
-    remove: removeDocumentById,
+  const createCollectionLayer = <T>(collectionName: collections) => {
+    return {
+        getOne: createCollectionFunction(collectionName, getDocument<T>),
+        getAll: createCollectionFunction(collectionName, getAllDocuments<T>),
+        createMany: createCollectionFunction(collectionName, postDocuments<T>),
+        createOne: createCollectionFunction(collectionName, postDocument<T>),
+        updateOne: createCollectionFunction(collectionName, updateDocument<T>),
+        getByArrayFilter: createCollectionFunction(collectionName, getDocumentsByArrayFilter<T>),
+        remove: createCollectionFunction(collectionName, removeDocumentById),
+        }
 };
 
-const getCollectionLayer = (collectionName: collections) => createCollectionLayer(collectionName, methods);
+const getCollectionLayer = <T>(collectionName: collections) => createCollectionLayer<T>(collectionName);
 
 export { getCollectionLayer };
   

@@ -9,7 +9,7 @@ import { addPostToList } from './lists/controllers/addPostToList';
 import { removePostFromList } from './lists/controllers/removePostFromList';
 import { getLists } from './lists/controllers/getLists';
 import { getListPosts } from './lists/controllers/getListPosts';
-import { createNewList } from './lists/controllers/createList';
+import { createNewList, createListSchema } from './lists/controllers/createList';
 import validate from '../../common/apiValidation';
 
 const v1Routes = Router();
@@ -80,12 +80,99 @@ v1Routes.get('/:accountUsername/posts', getAccountPosts);
  */
 v1Routes.post('/populate/:accountUsername/posts', validate(populateAccountPostsSchema), populateAccountPosts);
 
+/**
+ * @openapi
+ * '/api/posts/{:id}':
+ *  delete:
+ *     tags:
+ *     - Post Controller
+ *     summary: Remove post
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The post id to remove
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Bad Request
+ */
 v1Routes.delete('/posts/:id', validate(removePostSchema), removePost);
 
-v1Routes.post('/lists', createNewList);
+/**
+ * @openapi
+ * '/api/lists':
+ *  post:
+ *     tags:
+ *     - List Controller
+ *     summary: Create new list
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - name
+ *            properties:
+ *              name:
+ *                type: string
+ *                default: testlist 
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Bad Request
+ */
+v1Routes.post('/lists', validate(createListSchema), createNewList);
 
+/**
+ * @openapi
+ * '/api/add/:postId/toList/:listId':
+ *  put:
+ *     tags:
+ *     - List Controller
+ *     summary: Add post to list
+ *     parameters:
+ *       - name: postId
+ *         in: path
+ *         description: The post id to be added
+ *         required: true
+ *       - name: listId
+ *         in: path
+ *         description: The target list id
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Bad Request
+ */
 v1Routes.put('/add/:postId/toList/:listId', addPostToList);
 
+/**
+ * @openapi
+ * '/api/remove/:postId/fromList/:listId':
+ *  put:
+ *     tags:
+ *     - List Controller
+ *     summary: Remove post from list
+ *     parameters:
+ *       - name: postId
+ *         in: path
+ *         description: The post id to be removed
+ *         required: true
+ *       - name: listId
+ *         in: path
+ *         description: The target list id
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Bad Request
+ */
 v1Routes.put('/remove/:postId/fromList/:listId', removePostFromList);
 
 v1Routes.get('/lists', getLists);

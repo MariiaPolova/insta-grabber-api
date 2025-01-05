@@ -1,8 +1,8 @@
 import { Timestamp } from 'firebase-admin/firestore'; // todo abstract from firebase-admin
-import { collections } from "../../../../database/constants";
 import { IAccount } from "../../../../database/interfaces/accounts";
 import { IPost, IInstagramPost } from "../../../../database/interfaces/posts";
-import * as dbService from "../../../../database/database.service";
+import accountActions from '../../../../database/collections/accounts';
+import postActions from '../../../../database/collections/posts';
 import { getLastRunBuildId } from "../../../../service/client";
 import { getAccountPostsByUsername } from "../../../../service/methods/getAccountPostsByUsername";
 import { uploadImageFromCDN } from "../../../../storage/storage.service";
@@ -17,7 +17,7 @@ async function createPosts(posts: IInstagramPost[]) {
   try {
     let uniquePosts: IInstagramPost[];
     const postsIdsToBeCreated = posts.map(post => post.id);
-    const existingPosts = await dbService.getDocumentsByArrayFilter<IPost>(collections.accounts, getFieldName<IPost>('post_id'), postsIdsToBeCreated);
+    const existingPosts = await postActions.getByArrayFilter(getFieldName<IPost>('post_id'), postsIdsToBeCreated);
 
     if (existingPosts?.length) {
       uniquePosts = posts.filter(post => {
@@ -47,14 +47,14 @@ async function createPosts(posts: IInstagramPost[]) {
       accountPosts.forEach(accountPost => accountPost.display_url = `img-${accountPost.post_id}`)
     }
 
-    return dbService.postDocuments<IPost>(collections.posts, accountPosts);
+    return postActions.createMany(accountPosts);
   } catch (error) {
     throw new APIError(error);
   }
 }
 
 async function createAccountPosts(accountUsername: string, limit: number) {
-  const existingAccountInfo = await dbService.getDocument(collections.accounts, { username: accountUsername }) as IAccount;
+  const existingAccountInfo = await accountActions.getOne({ username: accountUsername }) as IAccount;
 
   // disallow fetching if last fetch was earlier than one week
   // if (new Date(lastFetchDate.toDate()) < new Date(Date.now() - ONE_WEEK_MS)) {

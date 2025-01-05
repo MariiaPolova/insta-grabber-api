@@ -1,18 +1,17 @@
-import { collections } from "../../../../database/constants";
 import { IPost } from "../../../../database/interfaces/posts";
-import * as dbService from "../../../../database/database.service";
-import { IList } from "../../../../database/interfaces/lists";
+import listActions from '../../../../database/collections/lists';
+import postActions from '../../../../database/collections/posts';
 import { getFieldName } from "../../../../common/commonMethods";
 import { APIError } from "../../../../common/BaseError";
 
 async function getPostsByList(listId: string): Promise<IPost[]> {
   try {
-    const list = await dbService.getDocument<IList>(collections.posts, { id: listId });
+    const list = await listActions.getOne({ id: listId });
     const { posts_ids } = list;
     if (posts_ids?.length) {
       return [];
     }
-    const documents = await dbService.getDocumentsByArrayFilter<IPost>(collections.accounts, getFieldName<IPost>('post_id'), posts_ids);
+    const documents = await postActions.getByArrayFilter(getFieldName<IPost>('post_id'), posts_ids);
     return documents;
   } catch (e) {
     throw new APIError(e);

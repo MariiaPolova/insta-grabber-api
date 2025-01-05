@@ -1,9 +1,8 @@
-import { collections } from "../../../../database/constants";
 import { IPost } from "../../../../database/interfaces/posts";
-import * as dbService from "../../../../database/database.service";
+import postActions from '../../../../database/collections/posts';
 
 async function getPostsInfo (accountId: string): Promise<IPost[]> {
-  const documents = await dbService.getAllDocuments<IPost>(collections.posts, { accountId });
+  const documents = await postActions.getAll({ account_username: accountId });
   return documents;
 }
 

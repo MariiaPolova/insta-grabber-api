@@ -1,9 +1,8 @@
-import { collections } from "../../../../database/constants";
 import { IAccount } from "../../../../database/interfaces/accounts";
-import * as dbService from "../../../../database/database.service";
+import accountActions from '../../../../database/collections/accounts';
 
 async function updateAccountById (id: string, accountData: Partial<IAccount>) {
-  return dbService.updateDocument<IAccount>(collections.accounts, id, accountData);
+  return accountActions.updateOne(id, accountData);
 }
 
 export { updateAccountById }

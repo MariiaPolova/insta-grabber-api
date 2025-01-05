@@ -1,8 +1,6 @@
-import { collections } from "../../../../database/constants";
-import { IAccount } from "../../../../database/interfaces/accounts";
-import * as dbService from "../../../../database/database.service";
+import accountActions from '../../../../database/collections/accounts';
 
 export const getAccountInfo = async (username) => {
-    const document = await dbService.getDocument<IAccount>(collections.accounts, username);
+    const document = await accountActions.getOne(username);
     return document;
 }

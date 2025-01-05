@@ -1,12 +1,9 @@
-
-import * as dbService from "../../../../database/database.service";
-import { collections } from "../../../../database/constants";
-import { IAccount } from "../../../../database/interfaces/accounts";
+import accountActions from '../../../../database/collections/accounts';
 
 export const getAccount = async (req, res) => {
     const { params } = req;
     const { username } = params;
-    const document: IAccount = await dbService.getDocument<IAccount>(collections.accounts, { username });
+    const document = await accountActions.getOne({ username });
     res.send({
         ...document,
         created_at: document?.created_at.toDate(),

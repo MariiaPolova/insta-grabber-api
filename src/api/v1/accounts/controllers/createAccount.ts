@@ -1,9 +1,9 @@
 
 import { firestore } from "firebase-admin";
 import Joi from 'joi';
+import { StatusCodes } from "http-status-codes";
 import { BadRequestError } from "../../../../common/BaseError";
 import accountActions from '../../../../database/collections/accounts';
-import { StatusCodes } from "http-status-codes";
 
 export const createAccountSchema = {
     body: Joi.object({

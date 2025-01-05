@@ -1,5 +1,4 @@
-import { collections } from "../../../../database/constants";
-import * as dbService from "../../../../database/database.service";
+import listActions from '../../../../database/collections/lists';
 import { Timestamp } from 'firebase-admin/firestore'; // todo abstract from firebase-admin
 import { IList } from "../../../../database/interfaces/lists";
 import { APIError } from "../../../../common/BaseError";
@@ -10,7 +9,7 @@ async function createList(listName: string) {
       name: listName,
       created_at: Timestamp.fromDate(new Date())
     };
-    return dbService.postDocument<IList>(collections.lists, list);
+    return listActions.createOne(list);
   } catch (e) {
     throw new APIError(e);
   }

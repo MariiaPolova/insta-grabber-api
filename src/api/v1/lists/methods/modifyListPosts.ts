@@ -1,13 +1,12 @@
-import { collections } from "../../../../database/constants";
-import * as dbService from "../../../../database/database.service";
 import { IList } from "../../../../database/interfaces/lists";
 import { BadRequestError, NotFoundError } from "../../../../common/BaseError";
-import { IPost } from "../../../../database/interfaces/posts";
+import listActions from '../../../../database/collections/lists';
+import postActions from '../../../../database/collections/posts';
 
 async function modifyListPosts(listId: string, postId: string, action: 'add' | 'remove') {
   const [list, post] = await Promise.all([
-    dbService.getDocument<IList>(collections.lists, { id: listId }),
-    dbService.getDocument<IPost>(collections.posts, { id: postId }),
+    listActions.getOne({ id: listId }),
+    postActions.getOne({ id: postId }),
   ]);
 
   if (!list) {
@@ -29,7 +28,7 @@ async function modifyListPosts(listId: string, postId: string, action: 'add' | '
     newPosts = posts_ids.filter(id => id !== postId);
   }
 
-  return dbService.updateDocument<IList>(collections.lists, listId, {
+  return listActions.updateOne(listId, {
     ...list, posts_ids: newPosts
   } as IList);
 }

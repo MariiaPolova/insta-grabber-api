@@ -1,9 +1,8 @@
-import { collections } from "../../../../database/constants";
 import { IAccount } from "../../../../database/interfaces/accounts";
-import * as dbService from "../../../../database/database.service";
+import accountActions from '../../../../database/collections/accounts';
 
 async function getAccountInfo (): Promise<IAccount[]> {
-  const documents = await dbService.getAllDocuments<IAccount>(collections.accounts);
+  const documents = await accountActions.getAll();
   return documents;
 }
 
