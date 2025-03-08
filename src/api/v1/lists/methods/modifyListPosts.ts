@@ -6,7 +6,7 @@ import postActions from '../../../../database/collections/posts';
 async function modifyListPosts(listId: string, postId: string, action: 'add' | 'remove') {
   const [list, post] = await Promise.all([
     listActions.getOne({ id: listId }),
-    postActions.getOne({ id: postId }),
+    postActions.getOne({ key: 'post_id', value: postId }),
   ]);
 
   if (!list) {

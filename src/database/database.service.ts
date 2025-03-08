@@ -1,8 +1,8 @@
 import { collections } from "./constants";
 import { db } from "../firebase";
 
-async function getDocument<T>(collectionName: collections, filter: { id?: string, username?: string }) {
-    const { id, username } = filter;
+async function getDocument<T>(collectionName: collections, filter: { id?: string, key?: string, value?: string }) {
+    const { id, key, value } = filter;
     const docRef: FirebaseFirestore.CollectionReference = db.collection(collectionName);
     let query: FirebaseFirestore.Query;
     if (id) {
@@ -12,8 +12,8 @@ async function getDocument<T>(collectionName: collections, filter: { id?: string
         } else {
             return null;
         }
-    } else if (username) {
-        query = docRef.where(`username`, '==', `${username}`);
+    } else if (key && value) {
+        query = docRef.where(key, '==', `${value}`);
     }
 
     const snapshot = await query.get();
@@ -73,8 +73,25 @@ async function updateDocument<T>(collectionName: collections, documentId: string
 
 async function getDocumentsByArrayFilter<T>(collectionName: collections, fieldName: keyof T, arrayFilter: Array<string | number>) {
     const collectionRef = db.collection(collectionName);
+    console.log('fieldName', fieldName);
+    console.log('arrayFilter', arrayFilter);
     const querySnapshot = await collectionRef
         .where(fieldName as string, "array-contains-any", arrayFilter)
+        .get();
+
+    const results = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+    }));
+    return results as T[];
+};
+
+async function getDocumentsInArray<T>(collectionName: collections, fieldName: keyof T, arrayFilter: Array<string | number>) {
+    const collectionRef = db.collection(collectionName);
+    console.log('fieldName', fieldName);
+    console.log('arrayFilter', arrayFilter);
+    const querySnapshot = await collectionRef
+        .where(fieldName as string, "in", arrayFilter)
         .get();
 
     const results = querySnapshot.docs.map((doc) => ({
@@ -95,5 +112,6 @@ export {
     postDocument, 
     updateDocument, 
     getDocumentsByArrayFilter, 
-    removeDocumentById 
+    removeDocumentById,
+    getDocumentsInArray 
 };

@@ -21,7 +21,7 @@ initClient();
 app.use(express.json())
 
 app.use(cors({
-  origin: 'http://localhost:3000'
+  origin: process.env.CLIENT_URL,
 }));
 
 // Serve Swagger UI documentation at /api-docs
@@ -32,7 +32,7 @@ app.use('/api', v1Routes);
 // app.use('/api', versionMiddleware('1.0.0'), v1Routes);
 
 app.listen(port, () => {
-  return console.log(`Express is listening at http://localhost:${port}`);
+  return console.log(`Express is listening at ${process.env.API_URL}:${port}`);
 });
 
 app.use(async (err: BaseError | Error, _req: Request, res: Response, next: NextFunction) => {

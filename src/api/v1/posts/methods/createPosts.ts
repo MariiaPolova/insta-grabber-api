@@ -29,6 +29,7 @@ async function createPosts(posts: IInstagramPost[]) {
 
     const accountPosts: IPost[] = uniquePosts
       .map(post => ({
+        id: post.id,
         account_username: post.ownerUsername,
         post_id: post.id,
         media_type: post.type,
@@ -54,7 +55,7 @@ async function createPosts(posts: IInstagramPost[]) {
 }
 
 async function createAccountPosts(accountUsername: string, limit: number) {
-  const existingAccountInfo = await accountActions.getOne({ username: accountUsername }) as IAccount;
+  const existingAccountInfo = await accountActions.getOne({ key: 'username', value: accountUsername }) as IAccount;
 
   // disallow fetching if last fetch was earlier than one week
   // if (new Date(lastFetchDate.toDate()) < new Date(Date.now() - ONE_WEEK_MS)) {

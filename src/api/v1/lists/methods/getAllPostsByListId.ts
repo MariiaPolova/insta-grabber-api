@@ -8,10 +8,10 @@ async function getPostsByList(listId: string): Promise<IPost[]> {
   try {
     const list = await listActions.getOne({ id: listId });
     const { posts_ids } = list;
-    if (posts_ids?.length) {
+    if (!posts_ids?.length) {
       return [];
     }
-    const documents = await postActions.getByArrayFilter(getFieldName<IPost>('post_id'), posts_ids);
+    const documents = await postActions.getDocumentsInArray(getFieldName<IPost>('post_id'), posts_ids);
     return documents;
   } catch (e) {
     throw new APIError(e);

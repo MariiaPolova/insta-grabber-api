@@ -14,7 +14,19 @@ import validate from '../../common/apiValidation';
 
 const v1Routes = Router();
 
-
+/**
+ * @openapi
+ * '/api/accounts':
+ *  get:
+ *     tags:
+ *     - Account Controller
+ *     summary: Get accounts
+ *     responses:
+ *      200:
+ *        description: OK
+ *      500:
+ *        description: Server Error
+ */
 v1Routes.get('/accounts', getAccounts);
 
 /**
@@ -46,8 +58,50 @@ v1Routes.get('/accounts', getAccounts);
  */
 v1Routes.post('/accounts', validate(createAccountSchema), createAccount);
 
+/**
+ * @openapi
+ * '/api/accounts/{username}':
+ *  get:
+ *     tags:
+ *     - Account Controller
+ *     summary: Get account by username
+  *     parameters:
+ *       - name: username
+ *         in: path
+ *         description: The target account name
+ *         required: true
+ *         schema:
+ *           type: string
+ *           default: johndoe
+ *     responses:
+ *      200:
+ *        description: OK
+ *      500:
+ *        description: Server Error
+ */
 v1Routes.get('/accounts/:username', getAccount);
 
+/**
+ * @openapi
+ * '/api/{accountUsername}/posts':
+ *  get:
+ *     tags:
+ *     - Post Controller
+ *     summary: Get account posts
+ *     parameters:
+ *       - name: accountUsername
+ *         in: path
+ *         description: The target account name
+ *         required: true
+ *         schema:
+ *           type: string
+ *           default: johndoe
+ *     responses:
+ *      200:
+ *        description: OK
+ *      500:
+ *        description: Server Error
+ */
 v1Routes.get('/:accountUsername/posts', getAccountPosts);
 
 /**
@@ -82,7 +136,7 @@ v1Routes.post('/populate/:accountUsername/posts', validate(populateAccountPostsS
 
 /**
  * @openapi
- * '/api/posts/{:id}':
+ * '/api/posts/{id}':
  *  delete:
  *     tags:
  *     - Post Controller
@@ -129,7 +183,7 @@ v1Routes.post('/lists', validate(createListSchema), createNewList);
 
 /**
  * @openapi
- * '/api/add/:postId/toList/:listId':
+ * '/api/add/{postId}/toList/{listId}':
  *  put:
  *     tags:
  *     - List Controller
@@ -153,7 +207,7 @@ v1Routes.put('/add/:postId/toList/:listId', addPostToList);
 
 /**
  * @openapi
- * '/api/remove/:postId/fromList/:listId':
+ * '/api/remove/{postId}/fromList/{listId}':
  *  put:
  *     tags:
  *     - List Controller
@@ -175,8 +229,42 @@ v1Routes.put('/add/:postId/toList/:listId', addPostToList);
  */
 v1Routes.put('/remove/:postId/fromList/:listId', removePostFromList);
 
+/**
+ * @openapi
+ * '/api/lists':
+ *  get:
+ *     tags:
+ *     - List Controller
+ *     summary: Get all lists
+ *     responses:
+ *      200:
+ *        description: OK
+ *      500:
+ *        description: Server Error
+ */
 v1Routes.get('/lists', getLists);
 
+/**
+ * @openapi
+ * '/api/list/{listId}':
+ *  get:
+ *     tags:
+ *     - List Controller
+ *     summary: Get all list posts
+ *     parameters:
+ *       - name: listId
+ *         in: path
+ *         description: The list ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *           default: johndoe
+ *     responses:
+ *      200:
+ *        description: OK
+ *      500:
+ *        description: Server Error
+ */
 v1Routes.get('/list/:listId', getListPosts);
 
 

@@ -14,7 +14,7 @@ export const createAccountSchema = {
 export const createAccount = async (req, res, next) => {
     try {
         const { username } = req.body;
-        const existingAccount = await accountActions.getOne({ username });
+        const existingAccount = await accountActions.getOne({ key: 'username', value: username });
 
         if (existingAccount) {
             throw new BadRequestError(`Account with  ${username} username is already created`);

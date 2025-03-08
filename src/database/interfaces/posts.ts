@@ -38,6 +38,7 @@ musicInfo: any, // object
 }
 
 interface IPost {
+    id: string;
     account_username: string;
     post_id: string;
     media_type: MediaType;
