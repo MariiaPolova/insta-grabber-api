@@ -11,6 +11,8 @@ import { getLists } from './lists/controllers/getLists';
 import { getListPosts } from './lists/controllers/getListPosts';
 import { createNewList, createListSchema } from './lists/controllers/createList';
 import validate from '../../common/apiValidation';
+import { getOutsidePosts } from './posts/controllers/fetchOutsidePost';
+import { getSinglePost } from './posts/controllers/getSinglePost';
 
 const v1Routes = Router();
 
@@ -266,6 +268,9 @@ v1Routes.get('/lists', getLists);
  *        description: Server Error
  */
 v1Routes.get('/list/:listId', getListPosts);
+
+v1Routes.get('/grab', getOutsidePosts);
+v1Routes.get('/posts/:id', getSinglePost);
 
 
 export default v1Routes;

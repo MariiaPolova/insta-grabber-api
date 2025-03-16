@@ -1,3 +1,5 @@
+import { firestore } from "firebase-admin";
+
 enum MediaType {
     video = 'Video',
 }
@@ -48,7 +50,7 @@ interface IPost {
     display_url: string;
     video_url?: string;
     images: string[];
-    created_at: Date;
+    created_at: firestore.Timestamp;
 }
 
 export { IPost, IInstagramPost };
