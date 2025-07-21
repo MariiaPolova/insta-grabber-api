@@ -1,10 +1,11 @@
 import { collections } from "./constants";
 import { db } from "../firebase";
+import { Query, CollectionReference } from 'firebase-admin/firestore';
 
 async function getDocument<T>(collectionName: collections, filter: { id?: string, key?: string, value?: string }) {
     const { id, key, value } = filter;
-    const docRef: FirebaseFirestore.CollectionReference = db.collection(collectionName);
-    let query: FirebaseFirestore.Query;
+    const docRef: CollectionReference = db.collection(collectionName);
+    let query: Query;
     if (id) {
         const doc = await docRef.doc(id)?.get();
         if (doc?.exists) {
@@ -27,7 +28,7 @@ async function getDocument<T>(collectionName: collections, filter: { id?: string
 };
 
 async function getAllDocuments<T>(collectionName: collections, filter?: object) {
-    let query: FirebaseFirestore.Query = db.collection(collectionName);
+    let query: Query = db.collection(collectionName);
 
     if (filter) {
         const filters = Object.entries(filter);
@@ -41,7 +42,7 @@ async function getAllDocuments<T>(collectionName: collections, filter?: object) 
 
     if (snapshot.empty) {
         console.log('No matching documents.');
-        return;
+        return [];
     }
 
     const results = snapshot.docs.map((doc) => ({
@@ -63,7 +64,15 @@ async function postDocuments<T>(collectionName: collections, documents: T[]) {
 
 async function postDocument<T>(collectionName: collections, document: T) {
     //automatically generate unique id
-    return db.collection(collectionName).add(document);
+    const docRef = await db.collection(collectionName).add(document);
+    const doc = await docRef.get();
+    if (doc.exists) {
+        console.log("Added document data:", doc.data());
+        return { id: doc.id, ...doc.data() };
+    } else {
+        console.log("Failed to post document, no data found.");
+        return null;
+    }
 };
 
 async function updateDocument<T>(collectionName: collections, documentId: string, updateData: Partial<T>) {
@@ -105,13 +114,28 @@ async function removeDocumentById(collectionName: collections, id) {
     return db.collection(collectionName).doc(id).delete();
 }
 
-export { 
-    getDocument, 
-    getAllDocuments, 
-    postDocuments, 
-    postDocument, 
-    updateDocument, 
-    getDocumentsByArrayFilter, 
+async function removeDocumentsByField<T>(collectionName: collections, fieldName: keyof T, fieldValue: string): Promise<void> {
+    const querySnapshot = await db.collection(collectionName)
+        .where(fieldName as string, "==", fieldValue)
+        .get();
+
+    const batch = db.batch();
+    querySnapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+    console.log(`Documents with ${fieldName as string}=${fieldValue} removed from ${collectionName}`);
+}
+
+export {
+    getDocument,
+    getAllDocuments,
+    postDocuments,
+    postDocument,
+    updateDocument,
+    getDocumentsByArrayFilter,
     removeDocumentById,
-    getDocumentsInArray 
+    getDocumentsInArray,
+    removeDocumentsByField
 };

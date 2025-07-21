@@ -8,7 +8,8 @@ import {
     updateDocument,
     getDocumentsByArrayFilter,
     removeDocumentById,
-    getDocumentsInArray
+    getDocumentsInArray,
+    removeDocumentsByField
 } from "../database.service";
   
 function createCollectionFunction<T extends (collectionName: collections, ...args: any[]) => any>(
@@ -28,6 +29,7 @@ function createCollectionFunction<T extends (collectionName: collections, ...arg
         getByArrayFilter: createCollectionFunction(collectionName, getDocumentsByArrayFilter<T>),
         getDocumentsInArray: createCollectionFunction(collectionName, getDocumentsInArray<T>),
         remove: createCollectionFunction(collectionName, removeDocumentById),
+        removeByField: createCollectionFunction(collectionName, removeDocumentsByField<T>),
         }
 };
 

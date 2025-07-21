@@ -23,7 +23,6 @@ async function listItems(input) {
     const run = await runClientActor(input);
 
     // Fetch and print Actor results from the run's dataset (if any)
-    console.log('Results from dataset');
     const { items } = await client.dataset(run.defaultDatasetId).listItems();
     return items;
 }

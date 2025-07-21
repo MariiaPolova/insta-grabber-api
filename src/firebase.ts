@@ -8,6 +8,7 @@ admin.initializeApp({
     storageBucket: process.env.STORAGE_BUCKET
 });
 const db = admin.firestore();
+db.settings({ ignoreUndefinedProperties: true });
 
 const storage = admin.storage();
 

@@ -5,13 +5,13 @@ import accountActions from '../../../../database/collections/accounts';
 import postActions from '../../../../database/collections/posts';
 import { getLastRunBuildId } from "../../../../service/client";
 import { getAccountPostsByUsername } from "../../../../service/methods/getAccountPostsByUsername";
-import { uploadImageFromCDN } from "../../../../storage/storage.service";
+import { uploadFileFromCDN } from "../../../../storage/storage.service";
 import { updateAccountById } from "../../accounts/methods/updateAccountById";
 import { getFieldName } from '../../../../common/commonMethods';
 import { APIError } from '../../../../common/BaseError';
 
 // const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-const NEW_FETCH = 30;
+const NEW_FETCH = 5;
 
 async function createPosts(posts: IInstagramPost[]) {
   try {
@@ -39,14 +39,34 @@ async function createPosts(posts: IInstagramPost[]) {
         display_url: post.displayUrl,
         video_url: post.videoUrl,
         images: post.images,
-        created_at: new Date(post.timestamp)
+        created_at: Timestamp.fromMillis(parseInt(post.timestamp))
       }))
 
-    const uploadFilesToStorageOps = posts.map(post => uploadImageFromCDN(post.displayUrl, `img-${post.id}`));
-    const uploadedUrls = await Promise.all(uploadFilesToStorageOps);
-    if (uploadedUrls) {
-      accountPosts.forEach(accountPost => accountPost.display_url = `img-${accountPost.post_id}`)
+    // const uploadVideoFilesToStorageOps = posts
+    // .filter(post => post.videoUrl)
+    // .map(post => uploadFileFromCDN(post.videoUrl, `video-${post.id}`));
+
+    console.log('Start uploading images to Firebase Storage');
+    const uploadedImageUrls = await Promise.all(posts.map(post => uploadFileFromCDN(post.displayUrl, `img-${post.id}`)));
+    if (uploadedImageUrls.length) {
+      accountPosts.forEach(accountPost => {
+        const imageUrl = uploadedImageUrls.find(({ url }) => url.includes(accountPost.post_id));
+        if (imageUrl) {
+          accountPost.display_url = imageUrl.path;
+        }
+      })
+      console.log('Start uploading images to Firebase Storage');
     }
+
+    // if(uploadVideoFilesToStorageOps.length) {
+    //   const uploadedVideoUrls = await Promise.all(uploadVideoFilesToStorageOps);
+    //   accountPosts.forEach(accountPost => {
+    //     const videoUrl = uploadedVideoUrls.find(({url}) => url.includes(accountPost.post_id));
+    //     if (videoUrl) {
+    //       accountPost.video_url = videoUrl.path;
+    //     }
+    //   })
+    // }
 
     return postActions.createMany(accountPosts);
   } catch (error) {
@@ -54,22 +74,34 @@ async function createPosts(posts: IInstagramPost[]) {
   }
 }
 
-async function createAccountPosts(accountUsername: string, limit: number) {
+async function createAccountPosts({ accountUsername, limit, renewFetch = false }
+  : { accountUsername: string, limit: number, renewFetch?: boolean }) {
   const existingAccountInfo = await accountActions.getOne({ key: 'username', value: accountUsername }) as IAccount;
 
+  if (!existingAccountInfo) {
+    throw new APIError(`Account with username ${accountUsername} does not exist`);
+  }
+
+  const { start_fetch_date, end_fetch_date, id } = existingAccountInfo;
   // disallow fetching if last fetch was earlier than one week
   // if (new Date(lastFetchDate.toDate()) < new Date(Date.now() - ONE_WEEK_MS)) {
   //   throw new Error('Early fetch is not allowed')
   // }
 
-  const accountInput = await getAccountPostsByUsername(accountUsername, limit || NEW_FETCH);
+  const params = {
+    username: accountUsername,
+    limit: limit || NEW_FETCH,
+    ...(renewFetch ? { startFetchDate: new Date(start_fetch_date.toDate()) } : {})
+  };
+
+  const accountInput = await getAccountPostsByUsername(params);
 
   await createPosts(accountInput);
 
   const lastBuild = await getLastRunBuildId();
-  await updateAccountById(existingAccountInfo.id, {
+  await updateAccountById(id, {
     last_build_id: lastBuild,
-    start_fetch_date: existingAccountInfo.end_fetch_date ?? Timestamp.fromDate(new Date()),
+    start_fetch_date: end_fetch_date ?? Timestamp.fromDate(new Date()),
     end_fetch_date: Timestamp.fromDate(new Date())
   });
 }
