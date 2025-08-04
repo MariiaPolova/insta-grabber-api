@@ -53,4 +53,8 @@ interface IPost {
     created_at: firestore.Timestamp;
 }
 
-export { IPost, IInstagramPost };
+interface IDatePost extends Omit<IPost, 'created_at'> {
+    created_at: Date;
+ }
+
+export { IPost, IInstagramPost, IDatePost };

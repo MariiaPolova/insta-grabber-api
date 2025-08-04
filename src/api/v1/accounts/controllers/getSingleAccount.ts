@@ -7,7 +7,7 @@ export const getAccount = async (req, res) => {
     res.send({
         ...document,
         created_at: document?.created_at.toDate(),
-        start_fetch_date: document?.start_fetch_date.toDate(),
-        end_fetch_date: document?.end_fetch_date.toDate()
+        start_fetch_date: document?.start_fetch_date?.toDate(),
+        end_fetch_date: document?.end_fetch_date?.toDate()
         });
 }

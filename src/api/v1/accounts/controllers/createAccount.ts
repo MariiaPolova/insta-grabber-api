@@ -17,13 +17,13 @@ export const createAccount = async (req, res, next) => {
         const existingAccount = await accountActions.getOne({ key: 'username', value: username });
 
         if (existingAccount) {
-            throw new BadRequestError(`Account with  ${username} username is already created`);
+            throw new BadRequestError(`Account with ${username} username is already created`);
         }
         const document = await accountActions.createOne({ 
             username, 
             created_at: firestore.Timestamp.now() 
         });
-        res.status(StatusCodes.CREATED).send(document);
+        return res.status(StatusCodes.CREATED).send(document);
     } catch (e) {
         next(e);
     }

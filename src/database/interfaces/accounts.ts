@@ -7,6 +7,7 @@ interface IAccount {
     start_fetch_date?: firestore.Timestamp;
     end_fetch_date?: firestore.Timestamp;
     last_build_id?: string;
+    full_name?: string;
 }
 
 export { IAccount };

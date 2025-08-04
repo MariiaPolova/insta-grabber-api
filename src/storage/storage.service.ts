@@ -24,10 +24,17 @@ function toNodeReadableStream(readableStream: ReadableStream<Uint8Array>): Reada
     });
 }
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const uploadImageFromCDN = async (cdnUrl: string, destinationPath: string): Promise<string> => {
+
+const uploadFileFromCDN = async (cdnUrl: string, destinationPath: string): Promise<{ url: string, path: string}> => {
     try {
+
+        console.log(`start uploading Firebase Storage: ${cdnUrl}`);
         const response = await fetch(cdnUrl);
+
+        // Add artificial delay (e.g., 500ms)
+        await delay(500);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch image: ${response.statusText}`);
@@ -35,6 +42,12 @@ const uploadImageFromCDN = async (cdnUrl: string, destinationPath: string): Prom
 
         const contentType = response.headers.get('content-type') || 'application/octet-stream';
 
+        // // Optional: Validate content type for videos or images
+        // const allowedTypes = ['video/mp4', 'video/avi', 'image/jpeg', 'image/png'];
+        // if (!allowedTypes.includes(contentType)) {
+        //     throw new Error(`Unsupported file type: ${contentType}`);
+        // }
+        
         // Convert the response body to a Node.js readable stream
         const nodeReadableStream = toNodeReadableStream(response.body as ReadableStream<Uint8Array>);
 
@@ -51,9 +64,9 @@ const uploadImageFromCDN = async (cdnUrl: string, destinationPath: string): Prom
 
         console.log(`File uploaded to Firebase Storage at: ${destinationPath}`);
         //   return file.getSignedUrl({action: 'read', expires: 10000});
-        return file.publicUrl();
+        return { url: file.publicUrl(), path: destinationPath };
     } catch (error) {
-        console.error('Error uploading image:', error);
+        console.error(`Error uploading image ${cdnUrl}:`, error);
         throw error;
     }
 };
@@ -75,4 +88,4 @@ const getSignedImage = async (fileName: string) => {
     return url;
 }
 
-export { uploadImage, uploadImageFromCDN, getSignedImage };
+export { uploadImage, uploadFileFromCDN, getSignedImage };
