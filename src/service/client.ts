@@ -1,7 +1,7 @@
 import { ApifyClient } from 'apify-client';
 
-let client;
-
+let client: ApifyClient;
+const clientId = process.env.APIFY_ACTOR_ID || 'default-actor-id';
 
 async function initClient() {
     if (client) return;
@@ -12,24 +12,24 @@ async function initClient() {
 
 }
 
-async function runClientActor(input) {
+async function runClientActor(input: unknown) {
     // Run the Actor and wait for it to finish
-    return client.actor(process.env.APIFY_ACTOR_ID).call(input);
+    return client.actor(clientId).call(input);
 }
 
 
-async function listItems(input) {
+async function listItems<T>(input: unknown): Promise<T[]> {
     // Run the Actor and wait for it to finish
     const run = await runClientActor(input);
 
     // Fetch and print Actor results from the run's dataset (if any)
     const { items } = await client.dataset(run.defaultDatasetId).listItems();
-    return items;
+    return items as T[];
 }
 
 async function getLastRunItems() {
     try {
-        const actorClient = client.actor(process.env.APIFY_ACTOR_ID);
+        const actorClient = client.actor(clientId);
 
         // Select the last run of your Actor that finished
         // with a SUCCEEDED status.
@@ -47,18 +47,23 @@ async function getLastRunItems() {
 
 async function getLastRunBuildId(): Promise<string> {
     try {
-        const actorClient = client.actor(process.env.APIFY_ACTOR_ID);
+        const actorClient = client.actor(clientId);
 
         // Select the last run of your Actor that finished
         // with a SUCCEEDED status.
         const lastSucceededRunClient = actorClient.lastRun({ status: 'SUCCEEDED' });
         // Fetches items from the run's dataset.
-        const { buildId } = await lastSucceededRunClient.get();
-
-        console.log(buildId);
+        const actorRun = await lastSucceededRunClient.get();
+        if (!actorRun) {
+            console.error('No last run found');
+            return '';
+        }
+        
+        const buildId = actorRun.buildId;
         return buildId;
     } catch (error) {
         console.error('Error fetching last run data:', error);
+        return '';
     }
 }
 

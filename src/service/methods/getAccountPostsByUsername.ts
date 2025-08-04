@@ -1,7 +1,8 @@
-import { listItems } from "../client";
+import { IInstagramPost } from "../../database/interfaces/posts.js";
+import { listItems } from "../client.js";
 
 // Prepare Actor input
-const input = ({ username, limit, startFetchDate }) => ({
+const input = ({ username, limit, startFetchDate }: { username: string; limit: number; startFetchDate?: string | null }) => ({
     "username": [
         username
     ],
@@ -10,7 +11,13 @@ const input = ({ username, limit, startFetchDate }) => ({
     ...(startFetchDate ? { "onlyPostsNewerThan": startFetchDate } : {})
 });
 
-export const getAccountPostsByUsername = ({ username, limit, startFetchDate = null }) => {
+interface GetAccountPostsByUsernameParams {
+    username: string;
+    limit: number;
+    startFetchDate?: string | null;
+}
+
+export const getAccountPostsByUsername = ({ username, limit, startFetchDate = null }: GetAccountPostsByUsernameParams) => {
     const accountInput = input({ username, limit, startFetchDate });
-    return listItems(accountInput);
+    return listItems<IInstagramPost>(accountInput);
 }

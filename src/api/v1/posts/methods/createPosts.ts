@@ -1,14 +1,14 @@
 import { Timestamp } from 'firebase-admin/firestore'; // todo abstract from firebase-admin
-import { IAccount } from "../../../../database/interfaces/accounts";
-import { IPost, IInstagramPost } from "../../../../database/interfaces/posts";
-import accountActions from '../../../../database/collections/accounts';
-import postActions from '../../../../database/collections/posts';
-import { getLastRunBuildId } from "../../../../service/client";
-import { getAccountPostsByUsername } from "../../../../service/methods/getAccountPostsByUsername";
-import { uploadFileFromCDN } from "../../../../storage/storage.service";
-import { updateAccountById } from "../../accounts/methods/updateAccountById";
-import { getFieldName } from '../../../../common/commonMethods';
-import { APIError } from '../../../../common/BaseError';
+import { IAccount } from "../../../../database/interfaces/accounts.js";
+import { IPost, IInstagramPost } from "../../../../database/interfaces/posts.js";
+import accountActions from '../../../../database/collections/accounts.js';
+import postActions from '../../../../database/collections/posts.js';
+import { getLastRunBuildId } from "../../../../service/client.js";
+import { getAccountPostsByUsername } from "../../../../service/methods/getAccountPostsByUsername.js";
+import { uploadFileFromCDN } from "../../../../storage/storage.service.js";
+import { updateAccountById } from "../../accounts/methods/updateAccountById.js";
+import { getFieldName } from '../../../../common/commonMethods.js';
+import { APIError } from '../../../../common/BaseError.js';
 
 // const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const NEW_FETCH = 5;
@@ -70,7 +70,7 @@ async function createPosts(posts: IInstagramPost[]) {
 
     return postActions.createMany(accountPosts);
   } catch (error) {
-    throw new APIError(error);
+    throw new APIError(String(error));
   }
 }
 
@@ -91,7 +91,8 @@ async function createAccountPosts({ accountUsername, limit, renewFetch = false }
   const params = {
     username: accountUsername,
     limit: limit || NEW_FETCH,
-    ...(renewFetch ? { startFetchDate: new Date(start_fetch_date.toDate()) } : {})
+    ...(renewFetch && start_fetch_date ? { startFetchDate: start_fetch_date.valueOf() } : {})
+    // ...(renewFetch && start_fetch_date ? { startFetchDate: new Date(start_fetch_date.toDate()) } : {})
   };
 
   const accountInput = await getAccountPostsByUsername(params);
@@ -99,11 +100,14 @@ async function createAccountPosts({ accountUsername, limit, renewFetch = false }
   await createPosts(accountInput);
 
   const lastBuild = await getLastRunBuildId();
-  await updateAccountById(id, {
-    last_build_id: lastBuild,
-    start_fetch_date: end_fetch_date ?? Timestamp.fromDate(new Date()),
-    end_fetch_date: Timestamp.fromDate(new Date())
-  });
+  if(id) {
+    await updateAccountById(id, {
+      // todo add description of account???
+      last_build_id: lastBuild,
+      start_fetch_date: end_fetch_date ?? Timestamp.fromDate(new Date()),
+      end_fetch_date: Timestamp.fromDate(new Date())
+    });
+  }
 }
 
 export { createAccountPosts }

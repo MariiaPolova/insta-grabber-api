@@ -1,6 +1,6 @@
-import { collections } from "../constants";
-import { IList } from "../interfaces/lists";
-import { getCollectionLayer } from "./common";
+import { collections } from "../constants.js";
+import { IList } from "../interfaces/lists.js";
+import { getCollectionLayer } from "./common.js";
 
 const collectionName = collections.lists;
 

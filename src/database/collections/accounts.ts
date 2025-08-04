@@ -1,6 +1,6 @@
-import { collections } from "../constants";
-import { IAccount } from "../interfaces/accounts";
-import { getCollectionLayer } from "./common";
+import { collections } from "../constants.js";
+import { IAccount } from "../interfaces/accounts.js";
+import { getCollectionLayer } from "./common.js";
 
 const collectionName = collections.accounts;
 

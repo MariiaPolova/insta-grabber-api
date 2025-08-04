@@ -1,6 +1,6 @@
 
 import { NextFunction, Request, Response } from 'express';
-import { modifyListPosts } from "../methods/modifyListPosts";
+import { modifyListPosts } from "../methods/modifyListPosts.js";
 
 
 export const removePostFromList = async (req: Request, res: Response, next: NextFunction) => {

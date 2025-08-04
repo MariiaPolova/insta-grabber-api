@@ -1,11 +1,13 @@
 import semver from 'semver';
-import { APIError } from '../common/BaseError';
 import { StatusCodes } from 'http-status-codes';
+import { NextFunction } from 'express';
+import { APIError } from '../common/BaseError.js';
 
-export const versionMiddleware = (version) =>
-    (req, res, next) => {
+export const versionMiddleware = (version: string) =>
+    (req: Request, res: Response, next: NextFunction) => {
         const { headers } = req;
-        if (headers['x-version'] && semver.gte(headers['x-version'], version)) {
+        const headerVersion = headers.get('x-version');
+        if (headerVersion && semver.gte(headerVersion, version)) {
             return next();
         }
 

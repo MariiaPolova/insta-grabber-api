@@ -1,7 +1,7 @@
-import listActions from '../../../../database/collections/lists';
 import { Timestamp } from 'firebase-admin/firestore'; // todo abstract from firebase-admin
-import { IList } from "../../../../database/interfaces/lists";
-import { APIError } from "../../../../common/BaseError";
+import listActions from '../../../../database/collections/lists.js';
+import { IList } from "../../../../database/interfaces/lists.js";
+import { APIError } from "../../../../common/BaseError.js";
 
 async function createList(listName: string) {
   try {
@@ -11,7 +11,7 @@ async function createList(listName: string) {
     };
     return listActions.createOne(list);
   } catch (e) {
-    throw new APIError(e);
+    throw new APIError(String(e));
   }
 }
 

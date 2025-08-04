@@ -1,0 +1,7 @@
+node_modules
+dist
+*.env
+*.private.json
+.idea
+.vscode
+.DS_Store

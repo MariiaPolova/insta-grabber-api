@@ -1,6 +1,6 @@
-import { collections } from "./constants";
-import { db } from "../firebase";
-import { Query, CollectionReference } from 'firebase-admin/firestore';
+import { Query, CollectionReference, WriteResult } from 'firebase-admin/firestore';
+import { collections } from "./constants.js";
+import { db } from "../firebase.js";
 
 async function getDocument<T>(collectionName: collections, filter: { id?: string, key?: string, value?: string }) {
     const { id, key, value } = filter;
@@ -15,16 +15,16 @@ async function getDocument<T>(collectionName: collections, filter: { id?: string
         }
     } else if (key && value) {
         query = docRef.where(key, '==', `${value}`);
+        
+        const snapshot = await query.get();
+        if (snapshot.empty) {
+            console.log('No matching documents.');
+            return null;
+        }
+        
+        const doc = snapshot.docs[0];
+        return { id: doc.id, ...doc.data() } as T;
     }
-
-    const snapshot = await query.get();
-    if (snapshot.empty) {
-        console.log('No matching documents.');
-        return null;
-    }
-
-    const doc = snapshot.docs[0];
-    return { id: doc.id, ...doc.data() } as T;
 };
 
 async function getAllDocuments<T>(collectionName: collections, filter?: object) {
@@ -56,7 +56,7 @@ async function postDocuments<T>(collectionName: collections, documents: T[]) {
     const batch = db.batch();
     documents.forEach(doc => {
         const docRef = db.collection(collectionName).doc(); //automatically generate unique id
-        batch.set(docRef, doc);
+        batch.set(docRef, doc as FirebaseFirestore.WithFieldValue<FirebaseFirestore.DocumentData>);
     })
 
     return batch.commit();
@@ -64,7 +64,7 @@ async function postDocuments<T>(collectionName: collections, documents: T[]) {
 
 async function postDocument<T>(collectionName: collections, document: T) {
     //automatically generate unique id
-    const docRef = await db.collection(collectionName).add(document);
+    const docRef = await db.collection(collectionName).add(document as FirebaseFirestore.WithFieldValue<FirebaseFirestore.DocumentData>);
     const doc = await docRef.get();
     if (doc.exists) {
         console.log("Added document data:", doc.data());
@@ -110,7 +110,7 @@ async function getDocumentsInArray<T>(collectionName: collections, fieldName: ke
     return results as T[];
 };
 
-async function removeDocumentById(collectionName: collections, id) {
+async function removeDocumentById(collectionName: collections, id: string): Promise<WriteResult> {
     return db.collection(collectionName).doc(id).delete();
 }
 

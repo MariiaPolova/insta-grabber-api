@@ -1,9 +1,9 @@
-import { IAccount } from "../../../../database/interfaces/accounts";
-import accountActions from '../../../../database/collections/accounts';
+import { IAccount } from "../../../../database/interfaces/accounts.js";
+import accountActions from '../../../../database/collections/accounts.js';
 
-async function getAccountInfo (): Promise<IAccount[]> {
+async function getAccountsInfo (): Promise<IAccount[]> {
   const documents = await accountActions.getAll();
   return documents;
 }
 
-export { getAccountInfo }
+export { getAccountsInfo }

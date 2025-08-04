@@ -1,6 +1,8 @@
-import accountActions from '../../../../database/collections/accounts';
 
-export const getAccount = async (req, res) => {
+import { Request, Response } from 'express';
+import accountActions from '../../../../database/collections/accounts.js';
+
+export const getAccount = async (req: Request, res: Response) => {
     const { params } = req;
     const { username } = params;
     const document = await accountActions.getOne({ key: 'username', value: username });

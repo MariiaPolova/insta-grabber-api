@@ -3,12 +3,12 @@ import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 
-import { handler as errorHandler } from "./common/appError";
+import { handler as errorHandler } from "./common/appError.js";
 
-import { initClient } from './service/client';
-import v1Routes from './api/v1';
-import { BaseError } from './common/BaseError';
-import { swaggerUi, swaggerSpec } from './common/swagger';
+import { initClient } from './service/client.js';
+import v1Routes from './api/v1/index.js';
+import { BaseError } from './common/BaseError.js';
+import { swaggerUi, swaggerSpec } from './common/swagger.js';
 // import { versionMiddleware } from './middleware/apiVersionMiddleware';
 const app = express();
 const port = 3001;

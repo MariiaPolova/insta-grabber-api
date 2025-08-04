@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { collections } from "../constants";
+import { collections } from "../constants.js";
 import {
     getDocument,
     getAllDocuments,
@@ -10,7 +10,7 @@ import {
     removeDocumentById,
     getDocumentsInArray,
     removeDocumentsByField
-} from "../database.service";
+} from "../database.service.js";
   
 function createCollectionFunction<T extends (collectionName: collections, ...args: any[]) => any>(
     collectionName: collections,

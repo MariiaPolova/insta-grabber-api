@@ -19,7 +19,7 @@ export class BaseError extends Error {
 
 export class APIError extends BaseError {
     constructor(
-        name,
+        name = 'API ERROR',
         httpCode = StatusCodes.INTERNAL_SERVER_ERROR,
         isOperational = true,
         description = getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)) {
