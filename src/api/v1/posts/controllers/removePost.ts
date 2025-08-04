@@ -1,7 +1,8 @@
 import Joi from "joi";
 import { StatusCodes } from "http-status-codes";
-import { APIError } from "../../../../common/BaseError";
-import postActions from '../../../../database/collections/posts';
+import { Request, Response } from "express";
+import { APIError } from "../../../../common/BaseError.js";
+import postActions from '../../../../database/collections/posts.js';
 
 export const removePostSchema = {
     params: Joi.object({
@@ -9,7 +10,7 @@ export const removePostSchema = {
     })
 };
 
-export const removePost = async (req, res) => {
+export const removePost = async (req: Request, res: Response) => {
     try {
         const { params } = req;
         const { id } = params;
@@ -17,6 +18,6 @@ export const removePost = async (req, res) => {
 
         res.sendStatus(StatusCodes.OK);
     } catch (err) {
-        throw new APIError(err);
+        throw new APIError(String(err));
     }
 }

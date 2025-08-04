@@ -1,8 +1,9 @@
 import { StatusCodes } from 'http-status-codes';
 import puppeteer from 'puppeteer';
+import { Request, Response } from 'express';
 
 
-export const getOutsidePosts = async (req, res) => {
+export const getOutsidePosts = async (req: Request, res: Response) => {
     // Launch the browser and open a new blank page
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();

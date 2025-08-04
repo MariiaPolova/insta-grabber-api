@@ -1,9 +1,10 @@
 
-import { firestore } from "firebase-admin";
+import * as admin from "firebase-admin";
 import Joi from 'joi';
 import { StatusCodes } from "http-status-codes";
-import { BadRequestError } from "../../../../common/BaseError";
-import accountActions from '../../../../database/collections/accounts';
+import { Request, Response, NextFunction } from 'express';
+import { BadRequestError } from "../../../../common/BaseError.js";
+import accountActions from '../../../../database/collections/accounts.js';
 
 export const createAccountSchema = {
     body: Joi.object({
@@ -11,7 +12,8 @@ export const createAccountSchema = {
     })
 };
 
-export const createAccount = async (req, res, next) => {
+
+export const createAccount = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { username } = req.body;
         const existingAccount = await accountActions.getOne({ key: 'username', value: username });
@@ -20,10 +22,10 @@ export const createAccount = async (req, res, next) => {
             throw new BadRequestError(`Account with ${username} username is already created`);
         }
         const document = await accountActions.createOne({ 
-            username, 
-            created_at: firestore.Timestamp.now() 
+            username,
+            created_at: admin.firestore.Timestamp.now() 
         });
-        return res.status(StatusCodes.CREATED).send(document);
+        res.status(StatusCodes.CREATED).send(document);
     } catch (e) {
         next(e);
     }

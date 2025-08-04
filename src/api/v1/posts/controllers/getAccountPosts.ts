@@ -1,10 +1,11 @@
-import { getSignedImage } from "../../../../storage/storage.service";
-import { IPost } from "../../../../database/interfaces/posts";
 import { StatusCodes } from "http-status-codes";
-import { getPostsInfo } from "../methods/getAllPostsById";
+import { Request, Response } from "express";
+import { getSignedImage } from "../../../../storage/storage.service.js";
+import { IPost } from "../../../../database/interfaces/posts.js";
+import { getPostsInfo } from "../methods/getAllPostsById.js";
 
 
-export const getAccountPosts = async (req, res) => {
+export const getAccountPosts = async (req: Request, res: Response) => {
     const { params } = req;
     const { accountUsername } = params;
     const documents: IPost[] = await getPostsInfo(accountUsername);

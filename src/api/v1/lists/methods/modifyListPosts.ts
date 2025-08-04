@@ -1,7 +1,7 @@
-import { IList } from "../../../../database/interfaces/lists";
-import { BadRequestError, NotFoundError } from "../../../../common/BaseError";
-import listActions from '../../../../database/collections/lists';
-import postActions from '../../../../database/collections/posts';
+import { IList } from "../../../../database/interfaces/lists.js";
+import { BadRequestError, NotFoundError } from "../../../../common/BaseError.js";
+import listActions from '../../../../database/collections/lists.js';
+import postActions from '../../../../database/collections/posts.js';
 
 async function modifyListPosts(listId: string, postId: string, action: 'add' | 'remove') {
   const [list, post] = await Promise.all([

@@ -1,13 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
-import { BadRequestError } from './BaseError';
+import { BadRequestError } from './BaseError.js';
+import Joi from 'joi';
 
-const validate = (schema) => (req: Request, res: Response, next: NextFunction) => {
+type ValidKeys = 'body' | 'query' | 'params';
+
+const validate = (schema: Partial<Record<ValidKeys, Joi.Schema>>) => (req: Request, res: Response, next: NextFunction) => {
   const validationOptions = { abortEarly: false, allowUnknown: true, stripUnknown: true };
-  ['body', 'query', 'params'].forEach((key) => {
+  (['body', 'query', 'params'] as ValidKeys[]).forEach((key) => {
     if (schema[key]) {
       const { error, value } = schema[key].validate(req[key], validationOptions);
-      if (error) {
-        throw new BadRequestError(error.details.map((detail) => detail.message).concat());
+      if (error as Joi.ValidationError) {
+        if (error && error.details) {
+          const errorMessage = error.details.map((detail: Joi.ValidationErrorItem) => detail.message).join(', ');
+          throw new BadRequestError(errorMessage);
+        }
       }
       req[key] = value;
     }

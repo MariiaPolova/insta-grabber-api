@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { createList } from "../methods/createList";
+import { Request, Response, NextFunction } from 'express';
+import { createList } from "../methods/createList.js";
 import Joi from "joi";
 
 export const createListSchema = {
@@ -8,7 +9,7 @@ export const createListSchema = {
     })
 }
 
-export const createNewList = async (req, res, next) => {
+export const createNewList = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { body } = req;
         const { name } = body;

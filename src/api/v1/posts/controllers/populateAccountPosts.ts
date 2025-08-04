@@ -1,6 +1,7 @@
 import Joi from "joi";
-import { createAccountPosts } from "../methods/createPosts";
 import { StatusCodes } from "http-status-codes";
+import { Request, Response } from "express";
+import { createAccountPosts } from "../methods/createPosts.js";
 
 export const populateAccountPostsSchema = {
     params: Joi.object({
@@ -9,7 +10,7 @@ export const populateAccountPostsSchema = {
     })
 };
 
-export const populateAccountPosts = async (req, res) => {
+export const populateAccountPosts = async (req: Request, res: Response) => {
     const { params, query } = req;
     const { accountUsername, renewFetch } = params;
     const { limit = 10 } = query;
@@ -22,6 +23,6 @@ export const populateAccountPosts = async (req, res) => {
         res.sendStatus(StatusCodes.OK);
     } catch (error) {
         console.error(error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(`Failed to populate posts for account ${accountUsername}: ${error.message}`);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(`Failed to populate posts for account ${accountUsername}: ${(error as Error)?.message}`);
     }
 }

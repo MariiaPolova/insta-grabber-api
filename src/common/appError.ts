@@ -1,7 +1,7 @@
 
 import { Response } from 'express';
-import { BaseError } from "./BaseError";
 import { StatusCodes, getReasonPhrase } from 'http-status-codes';
+import { BaseError } from "./BaseError.js";
 
 // centralized error handler encapsulates error-handling related logic
 class ErrorHandler {

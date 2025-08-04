@@ -1,16 +1,18 @@
-import { getSignedImage } from "../../../../storage/storage.service";
-import { IPost } from "../../../../database/interfaces/posts";
 import { StatusCodes } from "http-status-codes";
-import { getSinglePostInfo } from "../methods/getSinglePost";
+import { Request, Response } from "express";
+import { getSignedImage } from "../../../../storage/storage.service.js";
+import { IPost } from "../../../../database/interfaces/posts.js";
+import { getSinglePostInfo } from "../methods/getSinglePost.js";
 
 
-export const getSinglePost = async (req, res) => {
+export const getSinglePost = async (req: Request, res: Response) => {
     const { params } = req;
     const { id } = params;
-    const document: IPost = await getSinglePostInfo(id);
+    const document: IPost | null = await getSinglePostInfo(id);
 
     if (!document) {
-        return res.status(StatusCodes.NOT_FOUND).send('Post not found');
+        res.status(StatusCodes.NOT_FOUND).send('Post not found');
+        return;
     }
 
     const signedImage = await getSignedImage(document.display_url);

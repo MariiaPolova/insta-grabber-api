@@ -1,6 +1,6 @@
-import { collections } from "../constants";
-import { IPost } from "../interfaces/posts";
-import { getCollectionLayer } from "./common";
+import { collections } from "../constants.js";
+import { IPost } from "../interfaces/posts.js";
+import { getCollectionLayer } from "./common.js";
 
 const collectionName = collections.posts;
 

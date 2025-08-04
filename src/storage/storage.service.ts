@@ -1,8 +1,8 @@
 import { pipeline, Readable } from 'stream';
 import { promisify } from 'util';
-import { storage } from "../firebase";
+import { storage } from "../firebase.js";
 
-import serviceAccount from '../grabber-firebase-adminsdk.private.json';
+import serviceAccount from '../grabber-firebase-adminsdk.private.json' with { type: 'json' };
 
 const bucket = storage.bucket(serviceAccount.storage_bucket);
 

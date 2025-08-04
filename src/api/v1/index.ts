@@ -1,18 +1,18 @@
 import { Router } from 'express';
-import { getAccounts } from './accounts/controllers/getAccounts';
-import { createAccount, createAccountSchema } from './accounts/controllers/createAccount';
-import { getAccountPosts } from './posts/controllers/getAccountPosts';
-import { populateAccountPosts, populateAccountPostsSchema } from './posts/controllers/populateAccountPosts';
-import { getAccount } from './accounts/controllers/getSingleAccount';
-import { removePost, removePostSchema } from './posts/controllers/removePost';
-import { addPostToList } from './lists/controllers/addPostToList';
-import { removePostFromList } from './lists/controllers/removePostFromList';
-import { getLists } from './lists/controllers/getLists';
-import { getListPosts } from './lists/controllers/getListPosts';
-import { createNewList, createListSchema } from './lists/controllers/createList';
-import validate from '../../common/apiValidation';
-import { getOutsidePosts } from './posts/controllers/fetchOutsidePost';
-import { getSinglePost } from './posts/controllers/getSinglePost';
+import { getAccounts } from './accounts/controllers/getAccounts.js';
+import { createAccount, createAccountSchema } from './accounts/controllers/createAccount.js';
+import { getAccountPosts } from './posts/controllers/getAccountPosts.js';
+import { populateAccountPosts, populateAccountPostsSchema } from './posts/controllers/populateAccountPosts.js';
+import { getAccount } from './accounts/controllers/getSingleAccount.js';
+import { removePost, removePostSchema } from './posts/controllers/removePost.js';
+import { addPostToList } from './lists/controllers/addPostToList.js';
+import { removePostFromList } from './lists/controllers/removePostFromList.js';
+import { getLists } from './lists/controllers/getLists.js';
+import { getListPosts } from './lists/controllers/getListPosts.js';
+import { createNewList, createListSchema } from './lists/controllers/createList.js';
+import validate from '../../common/apiValidation.js';
+import { getOutsidePosts } from './posts/controllers/fetchOutsidePost.js';
+import { getSinglePost } from './posts/controllers/getSinglePost.js';
 
 const v1Routes = Router();
 
@@ -270,6 +270,7 @@ v1Routes.get('/lists', getLists);
 v1Routes.get('/list/:listId', getListPosts);
 
 v1Routes.get('/grab', getOutsidePosts);
+
 v1Routes.get('/posts/:id', getSinglePost);
 
 
