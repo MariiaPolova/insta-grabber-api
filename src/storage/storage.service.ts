@@ -2,9 +2,7 @@ import { pipeline, Readable } from 'stream';
 import { promisify } from 'util';
 import { storage } from "../firebase.js";
 
-import serviceAccount from '../grabber-firebase-adminsdk.private.json' with { type: 'json' };
-
-const bucket = storage.bucket(serviceAccount.storage_bucket);
+const bucket = storage.bucket(process.env.STORAGE_BUCKET);
 
 type ActionType = "read" | "write" | "delete" | "resumable";
 const pipelineAsync = promisify(pipeline);

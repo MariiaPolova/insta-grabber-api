@@ -1,4 +1,3 @@
-
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
@@ -11,7 +10,7 @@ import { BaseError } from './common/BaseError.js';
 import { swaggerUi, swaggerSpec } from './common/swagger.js';
 // import { versionMiddleware } from './middleware/apiVersionMiddleware';
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 // Load .env file variables into process.env
 dotenv.config();
