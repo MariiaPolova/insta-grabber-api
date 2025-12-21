@@ -46,8 +46,8 @@ async function getAllDocuments<T>(collectionName: collections, filter?: object) 
     }
 
     const results = snapshot.docs.map((doc) => ({
-        id: doc.id,
         ...doc.data(),
+        id: doc.id,
     }));
     return results as T[];
 };

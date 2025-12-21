@@ -5,7 +5,7 @@ async function getSinglePostInfo (id: string): Promise<IPost | null> {
   if (!id) {
     throw new Error("Post ID is required");
   }
-  const document = await postActions.getOne({ key: 'post_id', value: id });
+  const document = await postActions.getOne({ id });
   return document || null;
 }
 
