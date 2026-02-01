@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { verifyGoogleToken } from './googleAuth.js';
 
 /**
  * Middleware to verify authentication token
@@ -21,23 +22,18 @@ export const authMiddleware = async (
       return;
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
-    // Decode the JWT token (NextAuth uses JWT by default)
-    // You can verify the token signature here if needed
-    const decoded = JSON.parse(
-      Buffer.from(token.split('.')[1], 'base64').toString()
-    );
+  const decoded = await verifyGoogleToken(authHeader.substring(7));
 
     // Attach user info to request
     (req as any).user = {
-      id: decoded.sub,
-      email: decoded.email,
-      name: decoded.name,
+      id: decoded?.sub,
+      email: decoded?.email,
+      name: decoded?.name,
     };
 
     next();
-  } catch (error) {
+  } catch (error: any) {
     res.status(StatusCodes.UNAUTHORIZED).json({
       error: 'Unauthorized',
       message: 'Invalid or expired token'
@@ -45,33 +41,3 @@ export const authMiddleware = async (
   }
 };
 
-/**
- * Optional middleware - allows both authenticated and unauthenticated requests
- */
-export const optionalAuthMiddleware = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      const decoded = JSON.parse(
-        Buffer.from(token.split('.')[1], 'base64').toString()
-      );
-
-      (req as any).user = {
-        id: decoded.sub,
-        email: decoded.email,
-        name: decoded.name,
-      };
-    }
-
-    next();
-  } catch (error) {
-    // Continue without user info if token is invalid
-    next();
-  }
-};
