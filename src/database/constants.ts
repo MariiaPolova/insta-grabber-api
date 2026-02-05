@@ -1,6 +1,7 @@
 export enum collections {
     accounts = 'source_accounts',
     posts = 'posts',
-    lists = 'lists'
+    lists = 'lists',
+    users = 'users'
 }
 

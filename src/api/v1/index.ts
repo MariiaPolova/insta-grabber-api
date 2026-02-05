@@ -13,6 +13,8 @@ import { createNewList, createListSchema } from './lists/controllers/createList.
 import validate from '../../common/apiValidation.js';
 import { getOutsidePosts } from './posts/controllers/fetchOutsidePost.js';
 import { getSinglePost } from './posts/controllers/getSinglePost.js';
+import { getCurrentUser } from './users/controllers/getCurrentUser.js';
+import { linkAccount, linkAccountSchema } from './users/controllers/linkAccount.js';
 import { authMiddleware } from '../../middleware/authMiddleware.js';
 
 const v1Routes = Router();
@@ -109,7 +111,7 @@ v1Routes.get('/accounts/:username', getAccount);
  *      500:
  *        description: Server Error
  */
-v1Routes.get('/:accountUsername/posts', getAccountPosts);
+v1Routes.get('/:accountUsername/posts', authMiddleware, getAccountPosts);
 
 /**
  * @openapi
@@ -186,7 +188,7 @@ v1Routes.delete('/posts/:id', validate(removePostSchema), removePost);
  *       400:
  *         description: Bad Request
  */
-v1Routes.post('/lists', validate(createListSchema), createNewList);
+v1Routes.post('/lists', authMiddleware, validate(createListSchema), createNewList);
 
 /**
  * @openapi
@@ -249,7 +251,7 @@ v1Routes.put('/remove/:postId/fromList/:listId', removePostFromList);
  *      500:
  *        description: Server Error
  */
-v1Routes.get('/lists', getLists);
+v1Routes.get('/lists', authMiddleware, getLists);
 
 /**
  * @openapi
@@ -279,4 +281,50 @@ v1Routes.get('/grab', getOutsidePosts);
 v1Routes.get('/posts/:id', getSinglePost);
 
 
-export default v1Routes;
+export default v1Routes;/**
+ * @openapi
+ * '/api/user/me':
+ *  get:
+ *     tags:
+ *     - User Controller
+ *     summary: Get current authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *      200:
+ *        description: OK
+ *      401:
+ *        description: Unauthorized
+ */
+v1Routes.get('/user/me', authMiddleware, getCurrentUser);
+
+/**
+ * @openapi
+ * '/api/user/link-account':
+ *  post:
+ *     tags:
+ *     - User Controller
+ *     summary: Link an Instagram account to the current user
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - accountId
+ *            properties:
+ *              accountId:
+ *                type: string
+ *                description: The ID of the Instagram account to link
+ *     responses:
+ *      200:
+ *        description: OK
+ *      404:
+ *        description: Account not found
+ *      401:
+ *        description: Unauthorized
+ */
+v1Routes.post('/user/link-account', authMiddleware, validate(linkAccountSchema), linkAccount);
