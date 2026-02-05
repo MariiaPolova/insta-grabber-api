@@ -13,6 +13,7 @@ import { createNewList, createListSchema } from './lists/controllers/createList.
 import validate from '../../common/apiValidation.js';
 import { getOutsidePosts } from './posts/controllers/fetchOutsidePost.js';
 import { getSinglePost } from './posts/controllers/getSinglePost.js';
+import { authMiddleware } from '../../middleware/authMiddleware.js';
 
 const v1Routes = Router();
 
@@ -23,13 +24,17 @@ const v1Routes = Router();
  *     tags:
  *     - Account Controller
  *     summary: Get accounts
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *      200:
  *        description: OK
+ *      401:
+ *        description: Unauthorized
  *      500:
  *        description: Server Error
  */
-v1Routes.get('/accounts', getAccounts);
+v1Routes.get('/accounts', authMiddleware, getAccounts);
 
 /**
  * @openapi
