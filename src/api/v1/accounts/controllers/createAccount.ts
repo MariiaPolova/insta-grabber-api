@@ -5,6 +5,8 @@ import { StatusCodes } from "http-status-codes";
 import { Request, Response, NextFunction } from 'express';
 import { BadRequestError } from "../../../../common/BaseError.js";
 import accountActions from '../../../../database/collections/accounts.js';
+import { IUser } from "../../../../database/interfaces/users.js";
+import { AuthenticatedRequest } from "../../../../middleware/authMiddleware.js";
 
 export const createAccountSchema = {
     body: Joi.object({
@@ -16,12 +18,15 @@ export const createAccountSchema = {
 export const createAccount = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { username } = req.body;
+            // Get authenticated user from middleware
+        const user = (req as AuthenticatedRequest).user as IUser;
         const existingAccount = await accountActions.getOne({ key: 'username', value: username });
 
         if (existingAccount) {
             throw new BadRequestError(`Account with ${username} username is already created`);
         }
         const document = await accountActions.createOne({ 
+            user_id: user.id!,
             username,
             created_at: admin.firestore.Timestamp.now() 
         });

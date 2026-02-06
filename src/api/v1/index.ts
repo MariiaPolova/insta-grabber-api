@@ -14,7 +14,7 @@ import validate from '../../common/apiValidation.js';
 import { getOutsidePosts } from './posts/controllers/fetchOutsidePost.js';
 import { getSinglePost } from './posts/controllers/getSinglePost.js';
 import { getCurrentUser } from './users/controllers/getCurrentUser.js';
-import { linkAccount, linkAccountSchema } from './users/controllers/linkAccount.js';
+import { loginUser } from './users/controllers/loginUser.js';
 import { authMiddleware } from '../../middleware/authMiddleware.js';
 
 const v1Routes = Router();
@@ -281,7 +281,7 @@ v1Routes.get('/grab', getOutsidePosts);
 v1Routes.get('/posts/:id', getSinglePost);
 
 
-export default v1Routes;/**
+/**
  * @openapi
  * '/api/user/me':
  *  get:
@@ -295,36 +295,24 @@ export default v1Routes;/**
  *        description: OK
  *      401:
  *        description: Unauthorized
- */
+*/
 v1Routes.get('/user/me', authMiddleware, getCurrentUser);
 
 /**
  * @openapi
- * '/api/user/link-account':
- *  post:
+ * '/api/user/me':
+ *  get:
  *     tags:
  *     - User Controller
- *     summary: Link an Instagram account to the current user
+ *     summary: Get current authenticated user
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *      required: true
- *      content:
- *        application/json:
- *           schema:
- *            type: object
- *            required:
- *              - accountId
- *            properties:
- *              accountId:
- *                type: string
- *                description: The ID of the Instagram account to link
  *     responses:
  *      200:
  *        description: OK
- *      404:
- *        description: Account not found
  *      401:
  *        description: Unauthorized
- */
-v1Routes.post('/user/link-account', authMiddleware, validate(linkAccountSchema), linkAccount);
+*/
+v1Routes.post('/login', authMiddleware, loginUser);
+
+export default v1Routes;

@@ -5,6 +5,7 @@ import { IPost } from "../../../../database/interfaces/posts.js";
 import { IUser } from "../../../../database/interfaces/users.js";
 import { getPostsInfo } from "../methods/getAllPostsById.js";
 import accountActions from "../../../../database/collections/accounts.js";
+import { AuthenticatedRequest } from "../../../../middleware/authMiddleware.js";
 
 
 export const getAccountPosts = async (req: Request, res: Response) => {
@@ -12,19 +13,11 @@ export const getAccountPosts = async (req: Request, res: Response) => {
     const { accountUsername } = params;
     
     // Get authenticated user from middleware
-    const user = (req as any).user as IUser;
-    
-    // Check if user has an associated account
-    if (!user.accountId) {
-        res.status(StatusCodes.FORBIDDEN).json({
-            error: 'No account associated',
-            message: 'User does not have an Instagram account linked'
-        });
-        return;
-    }
+    const user = (req as AuthenticatedRequest).user as IUser;
     
     // Get the user's account to verify ownership
-    const userAccount = await accountActions.getOne({ id: user.accountId });
+    const userAccount = await accountActions.getOne({ key: 'username', value: accountUsername });
+    // TODO extend to multiple filters by user.id
     
     if (!userAccount) {
         res.status(StatusCodes.NOT_FOUND).json({
@@ -34,16 +27,7 @@ export const getAccountPosts = async (req: Request, res: Response) => {
         return;
     }
     
-    // Verify the requested account matches the user's account
-    if (userAccount.username !== accountUsername) {
-        res.status(StatusCodes.FORBIDDEN).json({
-            error: 'Access denied',
-            message: 'You can only access posts from your own account'
-        });
-        return;
-    }
-    
-    const documents: IPost[] = await getPostsInfo(accountUsername);
+    const documents: IPost[] = await getPostsInfo(accountUsername, user.id!);
     const documentsWithSignedUrls = await Promise.all(documents.map(async (doc) => {
         const image = await getSignedImage(doc.display_url);
         return { ...doc, display_url: image };

@@ -5,6 +5,11 @@ import { Timestamp } from 'firebase-admin/firestore';
 import userActions from '../database/collections/users.js';
 import { IUser } from '../database/interfaces/users.js';
 
+export interface AuthenticatedRequest extends Request {
+    user: IUser;
+}
+
+
 /**
  * Middleware to verify authentication token
  * For NextAuth.js, we'll verify the session token or JWT
@@ -68,9 +73,10 @@ export const authMiddleware = async (
     }
 
     // Attach full user info to request
-    (req as any).user = user;
+    (req as AuthenticatedRequest).user = user;
 
     next();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Auth middleware error:', error);
     res.status(StatusCodes.UNAUTHORIZED).json({
