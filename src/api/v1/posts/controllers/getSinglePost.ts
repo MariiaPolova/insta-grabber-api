@@ -18,6 +18,7 @@ export const getSinglePost = async (req: Request, res: Response) => {
     const signedImage = await getSignedImage(document.display_url);
     const documentWithSignedUrls = { 
         ...document, 
+        id,
         display_url: signedImage, 
         created_at: document.created_at.toDate(),
     };
