@@ -274,7 +274,7 @@ v1Routes.get('/lists', authMiddleware, getLists);
  *      500:
  *        description: Server Error
  */
-v1Routes.get('/list/:listId', getListPosts);
+v1Routes.get('/lists/:listId', getListPosts);
 
 v1Routes.get('/grab', getOutsidePosts);
 

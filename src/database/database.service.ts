@@ -97,8 +97,6 @@ async function getDocumentsByArrayFilter<T>(collectionName: collections, fieldNa
 
 async function getDocumentsInArray<T>(collectionName: collections, fieldName: keyof T, arrayFilter: Array<string | number>) {
     const collectionRef = db.collection(collectionName);
-    console.log('fieldName', fieldName);
-    console.log('arrayFilter', arrayFilter);
     const querySnapshot = await collectionRef
         .where(fieldName as string, "in", arrayFilter)
         .get();

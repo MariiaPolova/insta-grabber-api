@@ -1,4 +1,5 @@
 import { firestore } from "firebase-admin";
+import { IPost } from "./posts.js";
 
 interface IList {
     created_at: firestore.Timestamp;
@@ -6,4 +7,8 @@ interface IList {
     posts_ids?: string[]
 }
 
-export { IList };
+interface IListWithPosts extends Omit<IList, 'posts_ids'> {
+    posts_ids: IPost[];
+ }
+
+export { IList, IListWithPosts };

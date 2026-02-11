@@ -3,8 +3,9 @@ import listActions from '../../../../database/collections/lists.js';
 import postActions from '../../../../database/collections/posts.js';
 import { getFieldName } from "../../../../common/commonMethods.js";
 import { APIError } from "../../../../common/BaseError.js";
+import { IListWithPosts } from "../../../../database/interfaces/lists.js";
 
-async function getPostsByList(listId: string): Promise<IPost[]> {
+async function getPostsByList(listId: string): Promise<IListWithPosts> {
   try {
     const list = await listActions.getOne({ id: listId });
     if (!list) {
@@ -13,10 +14,10 @@ async function getPostsByList(listId: string): Promise<IPost[]> {
     
     const { posts_ids } = list;
     if (!posts_ids?.length) {
-      return [];
+      return { ...list, posts_ids: [] };
     }
     const documents = await postActions.getDocumentsInArray(getFieldName<IPost>('post_id'), posts_ids);
-    return documents;
+    return { ...list, posts_ids: documents };
   } catch (e) {
     throw new APIError(String(e));
   }

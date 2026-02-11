@@ -34,10 +34,7 @@ export const authMiddleware = async (
     const decoded = await verifyGoogleToken(authHeader.substring(7));
 
     if (!decoded) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        error: 'Unauthorized',
-        message: 'Invalid token'
-      });
+      res.redirect(StatusCodes.UNAUTHORIZED, 'api/auth/signout')
       return;
     }
 
