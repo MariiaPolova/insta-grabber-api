@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
+import morgan from 'morgan';
 import cors from 'cors';
 
 import { handler as errorHandler } from "./common/appError.js";
@@ -26,6 +27,8 @@ app.use(cors({
 // Serve Swagger UI documentation at /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+
+app.use(morgan('dev'));
 
 app.use('/api', v1Routes);
 // app.use('/api', versionMiddleware('1.0.0'), v1Routes);
