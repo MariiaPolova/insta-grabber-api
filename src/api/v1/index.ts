@@ -16,6 +16,7 @@ import { getSinglePost } from './posts/controllers/getSinglePost.js';
 import { getCurrentUser } from './users/controllers/getCurrentUser.js';
 import { loginUser } from './users/controllers/loginUser.js';
 import { authMiddleware } from '../../middleware/authMiddleware.js';
+import { removeListSchema, removeList } from './lists/controllers/removeList.js';
 
 const v1Routes = Router();
 
@@ -275,6 +276,26 @@ v1Routes.get('/lists', authMiddleware, getLists);
  *        description: Server Error
  */
 v1Routes.get('/lists/:listId', getListPosts);
+
+/**
+ * @openapi
+ * '/api/lists/{id}':
+ *  delete:
+ *     tags:
+ *     - List Controller
+ *     summary: Remove list
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The list id to remove
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Bad Request
+ */
+v1Routes.delete('/lists/:id', validate(removeListSchema), removeList);
 
 v1Routes.get('/grab', getOutsidePosts);
 
