@@ -4,6 +4,7 @@ import { createAccount, createAccountSchema } from './accounts/controllers/creat
 import { getAccountPosts } from './posts/controllers/getAccountPosts.js';
 import { populateAccountPosts, populateAccountPostsSchema } from './posts/controllers/populateAccountPosts.js';
 import { getAccount } from './accounts/controllers/getSingleAccount.js';
+import { removeAccount } from './accounts/controllers/removeAccount.js';
 import { removePost, removePostSchema } from './posts/controllers/removePost.js';
 import { addPostToList } from './lists/controllers/addPostToList.js';
 import { removePostFromList } from './lists/controllers/removePostFromList.js';
@@ -90,6 +91,29 @@ v1Routes.post('/accounts', validate(createAccountSchema), createAccount);
  *        description: Server Error
  */
 v1Routes.get('/accounts/:username', getAccount);
+
+/**
+ * @openapi
+ * '/api/accounts/{username}':
+ *  delete:
+ *     tags:
+ *     - Account Controller
+ *     summary: Remove account and all associated posts
+ *     parameters:
+ *       - name: username
+ *         in: path
+ *         description: The account username to remove
+ *         required: true
+ *         schema:
+ *           type: string
+ *           default: johndoe
+ *     responses:
+ *      200:
+ *        description: OK
+ *      500:
+ *        description: Server Error
+ */
+v1Routes.delete('/accounts/:username', removeAccount);
 
 /**
  * @openapi
