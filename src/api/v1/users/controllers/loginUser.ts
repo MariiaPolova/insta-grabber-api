@@ -10,14 +10,14 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     try {
             // Get authenticated user from middleware
         const user = (req as AuthenticatedRequest).user as IUser;
-        const existingAccount = await userActions.getOne({ id: user.id });
+        const existingAccount = await userActions.getOne(user.id!);
         
         if (existingAccount) {
             res.status(StatusCodes.OK).send();
             return;
         }
 
-        await userActions.createOne({ 
+        await userActions.createOne(user.id!, { 
             id: user.id!,
             email: user.email,
             name: user.name,

@@ -51,6 +51,7 @@ interface IPost {
     video_url?: string;
     images: string[];
     created_at: firestore.Timestamp;
+    user_id: string;
 }
 
 interface IDatePost extends Omit<IPost, 'created_at'> {

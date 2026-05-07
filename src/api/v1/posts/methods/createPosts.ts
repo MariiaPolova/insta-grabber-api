@@ -13,11 +13,11 @@ import { APIError } from '../../../../common/BaseError.js';
 // const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const NEW_FETCH = 5;
 
-async function createPosts(posts: IInstagramPost[]) {
+async function createPosts(user_id: string, posts: IInstagramPost[]) {
   try {
     let uniquePosts: IInstagramPost[];
     const postsIdsToBeCreated = posts.map(post => post.id);
-    const existingPosts = await postActions.getByArrayFilter(getFieldName<IPost>('post_id'), postsIdsToBeCreated);
+    const existingPosts = await postActions.getByArrayFilter(user_id,getFieldName<IPost>('post_id'), postsIdsToBeCreated);
 
     if (existingPosts?.length) {
       uniquePosts = posts.filter(post => {
@@ -39,7 +39,8 @@ async function createPosts(posts: IInstagramPost[]) {
         display_url: post.displayUrl,
         video_url: post.videoUrl,
         images: post.images,
-        created_at: Timestamp.fromMillis(parseInt(post.timestamp))
+        created_at: Timestamp.fromMillis(parseInt(post.timestamp)),
+        user_id,
       }))
 
     // const uploadVideoFilesToStorageOps = posts
@@ -68,21 +69,21 @@ async function createPosts(posts: IInstagramPost[]) {
     //   })
     // }
 
-    return postActions.createMany(accountPosts);
+    return postActions.createMany(user_id, accountPosts);
   } catch (error) {
     throw new APIError(String(error));
   }
 }
 
-async function createAccountPosts({ accountUsername, limit, renewFetch = false }
+async function createAccountPosts(user_id: string, { accountUsername, limit, renewFetch = false }
   : { accountUsername: string, limit: number, renewFetch?: boolean }) {
-  const existingAccountInfo = await accountActions.getOne({ key: 'username', value: accountUsername }) as IAccount;
+  const existingAccountInfo = await accountActions.getOne(user_id, { key: 'username', value: accountUsername }) as IAccount;
 
   if (!existingAccountInfo) {
     throw new APIError(`Account with username ${accountUsername} does not exist`);
   }
 
-  const { start_fetch_date, end_fetch_date, id } = existingAccountInfo;
+  const { start_fetch_date, end_fetch_date, id: account_id } = existingAccountInfo;
   // disallow fetching if last fetch was earlier than one week
   // if (new Date(lastFetchDate.toDate()) < new Date(Date.now() - ONE_WEEK_MS)) {
   //   throw new Error('Early fetch is not allowed')
@@ -97,11 +98,11 @@ async function createAccountPosts({ accountUsername, limit, renewFetch = false }
 
   const accountInput = await getAccountPostsByUsername(params);
 
-  await createPosts(accountInput);
+  await createPosts(user_id, accountInput);
 
   const lastBuild = await getLastRunBuildId();
-  if(id) {
-    await updateAccountById(id, {
+  if(account_id) {
+    await updateAccountById(user_id, account_id, {
       // todo add description of account???
       last_build_id: lastBuild,
       start_fetch_date: end_fetch_date ?? Timestamp.fromDate(new Date()),

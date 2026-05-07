@@ -5,17 +5,11 @@ import accountActions from '../../../../database/collections/accounts.js';
 import { AuthenticatedRequest } from '../../../../middleware/authMiddleware.js';
 
 export const getAccounts = async (req: Request, res: Response) => {
-    // Get authenticated user from middleware
-    const user = (req as AuthenticatedRequest).user;
+    console.log(`[Request] ${req.method} ${req.url}`);
     
-    // If user has an accountId, only return that account
-    if (user.id) {
-        const userAccounts = await accountActions.getAll({ user_id: user.id! });
-        res.status(StatusCodes.OK).send(userAccounts);
-        return;
-    }
+    const user_id = (req as AuthenticatedRequest).user.id;
+    const documents = await accountActions.getAll(user_id!);
     
-    // If no account associated, return empty array
-    res.status(StatusCodes.OK).send([]);
-    return;
+    console.log(`[Response] ${req.method} ${req.url} - Status: 200`);
+    res.send(documents);
 }

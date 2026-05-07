@@ -5,7 +5,8 @@ interface IList {
     id?: string;
     created_at: firestore.Timestamp;
     name: string;
-    posts_ids?: string[]
+    posts_ids?: string[];
+    user_id: string;
 }
 
 interface IListWithPosts extends Omit<IList, 'posts_ids'> {

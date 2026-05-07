@@ -4,6 +4,8 @@ import { verifyGoogleToken } from './googleAuth.js';
 import { Timestamp } from 'firebase-admin/firestore';
 import userActions from '../database/collections/users.js';
 import { IUser } from '../database/interfaces/users.js';
+import { collections } from '../database/constants.js';
+import { generateFirebaseId } from '../database/database.service.js';
 
 export interface AuthenticatedRequest extends Request {
     user: IUser;
@@ -42,7 +44,7 @@ export const authMiddleware = async (
     }
 
     // Check if user exists in database, create if not
-    let user = await userActions.getOne({ key: 'googleId', value: decoded.sub! });
+    let user = await userActions.getAuthOne({ key: 'googleId', value: decoded.sub! });
 
     if (!user) {
       // Create new user
@@ -54,7 +56,8 @@ export const authMiddleware = async (
         updated_at: Timestamp.now()
       };
 
-      const createdUser = await userActions.createOne(newUser as IUser);
+      const userId = generateFirebaseId(collections.users);
+      const createdUser = await userActions.createOne(userId, newUser as IUser);
       if (createdUser) {
         user = { ...newUser, id: createdUser.id } as IUser;
       } else {
@@ -66,7 +69,7 @@ export const authMiddleware = async (
       }
     } else {
       // Update last access time
-      await userActions.updateOne(user.id!, {
+      await userActions.updateOne(user.id!, user.id!, {
         ...user,
         updated_at: Timestamp.now()
       } as IUser);

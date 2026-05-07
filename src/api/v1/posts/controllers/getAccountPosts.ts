@@ -16,7 +16,7 @@ export const getAccountPosts = async (req: Request, res: Response) => {
     const user = (req as AuthenticatedRequest).user as IUser;
     
     // Get the user's account to verify ownership
-    const userAccount = await accountActions.getOne({ key: 'username', value: accountUsername });
+    const userAccount = await accountActions.getOne(user.id!, { key: 'username', value: accountUsername });
     // TODO extend to multiple filters by user.id
     
     if (!userAccount) {
@@ -27,7 +27,7 @@ export const getAccountPosts = async (req: Request, res: Response) => {
         return;
     }
     
-    const documents: IPost[] = await getPostsInfo(accountUsername, user.id!);
+    const documents: IPost[] = await getPostsInfo(user.id!, accountUsername);
     const documentsWithSignedUrls = await Promise.all(documents.map(async (doc) => {
         const image = await getSignedImage(doc.display_url);
         return { ...doc, display_url: image };

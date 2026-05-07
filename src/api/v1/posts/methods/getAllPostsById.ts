@@ -1,8 +1,8 @@
 import { IPost } from "../../../../database/interfaces/posts.js";
 import postActions from '../../../../database/collections/posts.js';
 
-async function getPostsInfo (accountId: string, userId: string): Promise<IPost[]> {
-  const documents = await postActions.getAll({ account_username: accountId, user_id: userId });
+async function getPostsInfo (userId: string, accountId: string): Promise<IPost[]> {
+  const documents = await postActions.getAll(userId, { account_username: accountId });
   return documents;
 }
 

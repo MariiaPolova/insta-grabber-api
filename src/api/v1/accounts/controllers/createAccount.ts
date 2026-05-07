@@ -1,4 +1,3 @@
-
 import * as admin from "firebase-admin";
 import Joi from 'joi';
 import { StatusCodes } from "http-status-codes";
@@ -20,12 +19,12 @@ export const createAccount = async (req: Request, res: Response, next: NextFunct
         const { username } = req.body;
             // Get authenticated user from middleware
         const user = (req as AuthenticatedRequest).user as IUser;
-        const existingAccount = await accountActions.getOne({ key: 'username', value: username });
+        const existingAccount = await accountActions.getOne(user.id!, { key: 'username', value: username });
 
         if (existingAccount) {
             throw new BadRequestError(`Account with ${username} username is already created`);
         }
-        const document = await accountActions.createOne({ 
+        const document = await accountActions.createOne(user.id!, { 
             user_id: user.id!,
             username,
             created_at: admin.firestore.Timestamp.now() 

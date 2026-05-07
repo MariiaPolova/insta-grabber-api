@@ -8,25 +8,27 @@ const collectionName = collections.accounts;
 
 const layer = getCollectionLayer<IAccount>(collectionName);
 
-async function removeAccountAndPosts(username: string) {
+async function removeAccountAndPosts(username: string, user_id: string) {
   try {
-    const accountToRemove = await getDocument<IAccount>(collections.accounts, { key: 'username', value: username });
+    const accountToRemove = await getDocument<IAccount>(collections.accounts, user_id, { key: 'username', value: username });
 
-    if(!accountToRemove?.id) {
-      throw new Error(`Account with username ${username} not found`);
+    if(!accountToRemove?.id || (accountToRemove as any).user_id !== user_id) {
+      throw new Error(`Account with username ${username} not found or unauthorized`);
     }
 
     await db.runTransaction(async (transaction) => {
       // Get all posts for this account
       const postsSnapshot = await transaction.get(
-        db.collection(collections.posts).where('account_username', '==', username)
+        db.collection(collections.posts).where('account_username', '==', username).where('user_id', '==', user_id)
       );
       
       const postIds = postsSnapshot.docs.map(doc => doc.id);
       
-      // Remove posts from all lists
+      // Remove posts from user's lists only
       if (postIds.length > 0) {
-        const listsSnapshot = await transaction.get(db.collection(collections.lists));
+        const listsSnapshot = await transaction.get(
+          db.collection(collections.lists).where('user_id', '==', user_id)
+        );
         listsSnapshot.docs.forEach((listDoc) => {
           const listData = listDoc.data();
           const updatedPostIds = (listData.posts || []).filter((id: string) => !postIds.includes(id));

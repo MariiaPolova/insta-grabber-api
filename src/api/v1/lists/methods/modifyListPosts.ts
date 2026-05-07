@@ -3,10 +3,10 @@ import { BadRequestError, NotFoundError } from "../../../../common/BaseError.js"
 import listActions from '../../../../database/collections/lists.js';
 import postActions from '../../../../database/collections/posts.js';
 
-async function modifyListPosts(listId: string, postId: string, action: 'add' | 'remove') {
+async function modifyListPosts(user_id: string, listId: string, postId: string, action: 'add' | 'remove') {
   const [list, post] = await Promise.all([
-    listActions.getOne({ id: listId }),
-    postActions.getOne({ key: 'post_id', value: postId }),
+    listActions.getOne(user_id, { id: listId }),
+    postActions.getOne(user_id, { key: 'post_id', value: postId }),
   ]);
 
   if (!list) {
@@ -28,7 +28,7 @@ async function modifyListPosts(listId: string, postId: string, action: 'add' | '
     newPosts = posts_ids.filter(id => id !== postId);
   }
 
-  return listActions.updateOne(listId, {
+  return listActions.updateOne(user_id, listId, {
     ...list, posts_ids: newPosts
   } as IList);
 }
